@@ -18,6 +18,7 @@ import {
   addEdge,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   type Connection,
   type Edge,
 } from "@xyflow/react";
@@ -87,6 +88,15 @@ function SandboxInner() {
   const [nodes, setNodes, onNodesChange] = useNodesState<AcademyNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const idRef = useRef(0);
+  const { fitView } = useReactFlow();
+
+  // reenquadra o canvas para nenhum nó ficar fora da área visível
+  const requestFit = useCallback(() => {
+    window.setTimeout(
+      () => fitView({ padding: 0.25, duration: 200, maxZoom: 1.2 }),
+      60
+    );
+  }, [fitView]);
 
   const [challengeId, setChallengeId] = useState<string>(
     () => searchParams.get("challenge") ?? ""
@@ -103,6 +113,7 @@ function SandboxInner() {
       const { nodes: n, edges: e } = setupToFlow(initial);
       setNodes(n);
       setEdges(e);
+      requestFit();
       return;
     }
     try {
@@ -112,6 +123,7 @@ function SandboxInner() {
         if (Array.isArray(data.nodes)) setNodes(data.nodes);
         if (Array.isArray(data.edges)) setEdges(data.edges);
         idRef.current = data.idc ?? data.nodes?.length ?? 0;
+        requestFit();
       }
     } catch {
       /* canvas salvo corrompido: começa vazio */
@@ -177,8 +189,9 @@ function SandboxInner() {
           data: { ctype },
         },
       ]);
+      requestFit();
     },
-    [setNodes]
+    [setNodes, requestFit]
   );
 
   const isValidConnection = useCallback(
@@ -288,6 +301,7 @@ function SandboxInner() {
       setLogSteps([]);
       setRunning(false);
       setTyping(false);
+      requestFit();
     }
   }
 

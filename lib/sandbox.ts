@@ -178,6 +178,18 @@ export const NODE_CATALOG: CatalogEntry[] = [
     provides: null,
   },
   {
+    type: "text-classifier",
+    label: "Text Classifier",
+    icon: "🛡️",
+    category: "Produção",
+    desc: "Guardrail: classifica/filtra o input do cliente ANTES do agente (escopo, abuso, injection).",
+    n8nType: "@n8n/n8n-nodes-langchain.textClassifier",
+    mainIn: true,
+    mainOut: true,
+    accepts: ["model"],
+    provides: null,
+  },
+  {
     type: "whatsapp-send",
     label: "WhatsApp Send",
     icon: "📤",

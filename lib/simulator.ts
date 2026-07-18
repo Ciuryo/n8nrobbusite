@@ -66,18 +66,34 @@ export function simulate(
   const brain = agent ?? chain;
 
   if (!brain) {
-    // Fluxo de eco (Nível 0): Trigger → Send direto, sem IA
+    // Fluxo sem IA (Níveis 0–1): Trigger → [Code] → Send
     if (mainPathReaches(g, trigger.id, "whatsapp-send")) {
-      steps.push({
-        tag: "Flow",
-        text: "Nenhum nó de IA no fluxo — modo eco: o item { json: { from, text } } segue direto pelo fluxo principal.",
-        tone: "info",
-      });
-      steps.push({
-        tag: "Flow",
-        text: "Texto recebido repassado ao nó de saída sem transformação",
-        tone: "action",
-      });
+      const hasCode =
+        nodesOfType(g, "code").length > 0 &&
+        mainPathReaches(g, trigger.id, "code");
+      if (hasCode) {
+        steps.push({
+          tag: "Code",
+          text: "entry[0].changes[0].value.messages[0] → { from, text } — payload aninhado achatado em uma passada",
+          tone: "action",
+        });
+        steps.push({
+          tag: "Code",
+          text: 'Retorno no formato de item do n8n: [{ json: { from: "+55 11 98765-4321", text: "…" } }]',
+          tone: "observation",
+        });
+      } else {
+        steps.push({
+          tag: "Flow",
+          text: "Nenhum nó de IA no fluxo — modo eco: o item { json: { from, text } } segue direto pelo fluxo principal.",
+          tone: "info",
+        });
+        steps.push({
+          tag: "Flow",
+          text: "Texto recebido repassado ao nó de saída sem transformação",
+          tone: "action",
+        });
+      }
       steps.push({
         tag: "WhatsApp",
         text: 'POST /v19.0/{phone-number-id}/messages → 200 { "messages": [{ "id": "wamid.HBg..." }] }',
@@ -86,7 +102,10 @@ export function simulate(
       return {
         steps,
         userMessage,
-        botReply: `Eco 🤖: "${userMessage}"`,
+        botReply:
+          hasCode && challenge?.botReply
+            ? challenge.botReply
+            : `Eco 🤖: "${userMessage}"`,
         ok: true,
       };
     }
@@ -101,6 +120,16 @@ export function simulate(
       "Runtime",
       `O ${CATALOG_BY_TYPE[brain.type].label} existe no canvas, mas não está conectado ao fluxo principal do Trigger. Arraste a conexão main (→).`
     );
+  }
+
+  // Guardrail: classificador de input antes do cérebro
+  const guard = nodesOfType(g, "text-classifier")[0];
+  if (guard && mainPathReaches(g, trigger.id, "text-classifier")) {
+    steps.push({
+      tag: "Guardrail",
+      text: "Text Classifier: input inspecionado ANTES do agente — escopo validado, tentativa de injection sinalizada ao system prompt",
+      tone: "observation",
+    });
   }
 
   const models = providersOf(g, brain.id, "model");

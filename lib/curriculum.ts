@@ -362,6 +362,7 @@ export const SKILL_TREE: SkillNode[] = [
     ],
     deps: ["json-mastery"],
     xp: 120,
+    challengeId: "payload-domado",
     pos: { col: 3, row: 0 },
   },
   {
@@ -498,6 +499,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["llm-nodes"],
     xp: 150,
     bonusClass: "prompt-engineer",
+    challengeId: "primeira-chain",
     pos: { col: 5, row: 0 },
   },
   {
@@ -1120,6 +1122,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["ai-agent", "retrieval"],
     xp: 220,
     bonusClass: "prompt-engineer",
+    challengeId: "guardrail-blindado",
     pos: { col: 9, row: -1 },
   },
 ];
