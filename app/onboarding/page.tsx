@@ -83,7 +83,7 @@ export default function OnboardingPage() {
         <p className="mb-2 text-center font-mono text-xs uppercase tracking-[0.3em] text-neon">
           Inicialização de operador
         </p>
-        <h1 className="mb-8 text-center text-3xl font-bold">
+        <h1 className="font-display mb-8 text-center text-3xl font-bold">
           Criação de Personagem
         </h1>
 

@@ -5,6 +5,7 @@ const COLORS = ["#22d3ee", "#e879f9", "#fbbf24", "#34d399", "#d7e2f4"];
 
 export function fireConfetti(count = 90) {
   if (typeof document === "undefined") return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
   const canvas = document.createElement("canvas");
   canvas.style.cssText =

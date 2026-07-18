@@ -6,6 +6,8 @@ import {
   TOTAL_XP,
   CLASSES,
   LEVEL_NAMES,
+  LEVEL_COLORS,
+  RANKS,
   rankFor,
   nodeState,
 } from "@/lib/curriculum";
@@ -65,28 +67,48 @@ export default function Home() {
       <div className="mx-auto max-w-6xl px-4 py-14">
         {/* Hero */}
         <div className="text-center">
-          <p className="font-mono text-xs uppercase tracking-[0.4em] text-neon">
+          <div className="rise mx-auto flex justify-center">
+            <div className="hero-hex" aria-hidden>
+              ⬢
+            </div>
+          </div>
+          <p className="rise mt-6 font-mono text-xs uppercase tracking-[0.4em] text-neon">
             n8n · LangChain · WhatsApp Cloud API
           </p>
-          <h1 className="mx-auto mt-3 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">
-            <span className="neon-text text-neon">RobbuGame</span>N8N
+          <h1 className="font-display rise-2 mx-auto mt-3 max-w-3xl text-4xl font-bold leading-tight sm:text-6xl">
+            <span className="glow-grad">RobbuGame</span>N8N
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
+          <p className="rise-2 mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
             Plataforma gamificada de treinamento em{" "}
             <span className="text-foreground">Inteligência Artificial</span>,{" "}
             <span className="text-foreground">RAG</span> e{" "}
             <span className="text-foreground">orquestração de agentes</span> no
             n8n — do primeiro nó ao agente autônomo respondendo no WhatsApp.
           </p>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-success">
+          <p className="rise-3 mx-auto mt-3 max-w-xl text-sm text-success">
             🌱 Nenhuma experiência prévia é necessária: o Nível 0 explica o que
             é o n8n antes de qualquer linha de código.
           </p>
 
+          <div className="rise-3 mt-5 flex flex-wrap justify-center gap-2 font-mono text-[11px]">
+            {[
+              `⬢ ${SKILL_TREE.length} competências`,
+              `◆ ${CHALLENGES.length} desafios`,
+              `🎖 ${RANKS.length} patentes`,
+            ].map((chip) => (
+              <span
+                key={chip}
+                className="rounded-full border border-edge bg-surface-2/60 px-3 py-1 text-muted"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
+
           {hydrated && !onboarded && (
             <Link
               href="/onboarding"
-              className="mt-8 inline-block rounded-lg bg-neon px-8 py-4 text-base font-bold text-background shadow-[0_0_30px_rgba(34,211,238,0.35)] transition hover:brightness-110"
+              className="btn-primary rise-3 mt-8 inline-block rounded-lg px-8 py-4 text-base font-bold"
             >
               ▶ Iniciar Onboarding — Criar Personagem
             </Link>
@@ -129,7 +151,7 @@ export default function Home() {
                 </div>
                 <Link
                   href="/skills"
-                  className="mt-4 block rounded-md bg-neon py-2.5 text-center text-sm font-bold text-background hover:brightness-110"
+                  className="btn-primary mt-4 block rounded-md py-2.5 text-center text-sm font-bold"
                 >
                   Continuar treinamento →
                 </Link>
@@ -141,7 +163,9 @@ export default function Home() {
         {/* Sala de Troféus */}
         {hydrated && onboarded && (
           <div className="mt-16">
-            <h2 className="text-center text-xl font-bold">🏆 Sala de Troféus</h2>
+            <h2 className="font-display text-center text-xl font-bold">
+              🏆 Sala de Troféus
+            </h2>
             <p className="mt-1 text-center text-sm text-muted">
               {earned.length}/{ACHIEVEMENTS.length} conquistas desbloqueadas
               {streakDays >= 1 && (
@@ -180,7 +204,9 @@ export default function Home() {
 
         {/* Como funciona (guia rápido para quem chega agora) */}
         <div className="mt-16">
-          <h2 className="text-center text-xl font-bold">Como Funciona</h2>
+          <h2 className="font-display text-center text-xl font-bold">
+            Como Funciona
+          </h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
@@ -208,10 +234,15 @@ export default function Home() {
                 desc: "De Recruta do n8n a Arquiteto Agêntico: acumule XP, complete desafios e dispute o leaderboard.",
               },
             ].map((s) => (
-              <div key={s.step} className="panel p-5">
+              <div
+                key={s.step}
+                className="panel p-5 transition hover:-translate-y-0.5 hover:border-neon/40"
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-2xl">{s.icon}</span>
-                  <span className="font-mono text-xs text-neon">{s.step}</span>
+                  <span className="font-arcade text-[10px] text-neon">
+                    {s.step}
+                  </span>
                 </div>
                 <h3 className="mt-3 text-sm font-semibold">{s.title}</h3>
                 <p className="mt-1.5 text-xs leading-relaxed text-muted">
@@ -228,7 +259,7 @@ export default function Home() {
             <Link
               key={f.href}
               href={f.href}
-              className="panel group p-6 transition hover:border-neon/60"
+              className="panel group p-6 transition hover:-translate-y-0.5 hover:border-neon/60"
             >
               <div className="text-3xl">{f.icon}</div>
               <h2 className="mt-3 font-semibold group-hover:text-neon">
@@ -241,7 +272,7 @@ export default function Home() {
 
         {/* Currículo */}
         <div className="mt-16">
-          <h2 className="text-center text-xl font-bold">
+          <h2 className="font-display text-center text-xl font-bold">
             Matriz Curricular — do Nível 0 ao 6
           </h2>
           <p className="mt-1 text-center text-sm text-muted">
@@ -251,9 +282,17 @@ export default function Home() {
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Object.entries(LEVEL_NAMES).map(([lvl, title]) => {
               const nodes = SKILL_TREE.filter((n) => n.level === Number(lvl));
+              const color = LEVEL_COLORS[Number(lvl)];
               return (
-                <div key={lvl} className="panel p-4">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-neon">
+                <div
+                  key={lvl}
+                  className="panel p-4"
+                  style={{ borderLeft: `3px solid ${color}` }}
+                >
+                  <div
+                    className="font-mono text-[10px] uppercase tracking-widest"
+                    style={{ color }}
+                  >
                     Nível {lvl}
                   </div>
                   <div className="mt-1 text-sm font-semibold">{title}</div>

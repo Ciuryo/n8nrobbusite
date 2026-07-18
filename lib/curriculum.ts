@@ -64,6 +64,17 @@ export interface SkillNode {
   pos: { col: number; row: number };
 }
 
+/** Rampa de cor por nível: do ciano (fundamentos) ao magenta (produção) */
+export const LEVEL_COLORS: Record<number, string> = {
+  0: "#22d3ee",
+  1: "#38bdf8",
+  2: "#60a5fa",
+  3: "#818cf8",
+  4: "#a78bfa",
+  5: "#c084fc",
+  6: "#e879f9",
+};
+
 export const LEVEL_NAMES: Record<number, string> = {
   0: "Introdução — Bem-vindo ao n8n",
   1: "Fundamentos de Automação e Mensageria",

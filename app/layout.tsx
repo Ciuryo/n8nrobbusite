@@ -1,5 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Chakra_Petch,
+  Press_Start_2P,
+} from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import PwaRegister from "@/components/PwaRegister";
@@ -14,6 +19,20 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Display angular estilo HUD para títulos
+const chakra = Chakra_Petch({
+  weight: ["600", "700"],
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-display",
+});
+
+// Fonte arcade 8-bit — usada com parcimônia nos números de XP
+const arcade = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-arcade",
 });
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -48,7 +67,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${chakra.variable} ${arcade.variable} h-full antialiased`}
     >
       <body className="flex min-h-screen flex-col">
         <PwaRegister />

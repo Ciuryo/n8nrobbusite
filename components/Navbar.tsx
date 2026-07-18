@@ -19,13 +19,13 @@ export default function Navbar() {
   const pct = Math.min(100, Math.round((xp / TOTAL_XP) * 100));
 
   return (
-    <header className="safe-top sticky top-0 z-40 border-b border-edge bg-background/85 backdrop-blur">
+    <header className="safe-top sticky top-0 z-40 border-b border-edge bg-background/85 shadow-[0_1px_0_0_rgba(34,211,238,0.15)] backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="rounded bg-neon/10 px-2 py-1 font-mono text-sm font-bold text-neon neon-text">
+        <Link href="/" className="group flex items-center gap-2">
+          <span className="rounded bg-neon/10 px-2 py-1 font-mono text-sm font-bold text-neon neon-text transition group-hover:bg-neon/20">
             ⬢ Robbu
           </span>
-          <span className="hidden font-semibold tracking-wide sm:inline">
+          <span className="font-display hidden font-semibold tracking-wide sm:inline">
             GameN8N
           </span>
         </Link>
@@ -56,8 +56,8 @@ export default function Navbar() {
         )}
 
         {hydrated && onboarded && (
-          <span className="shrink-0 font-mono text-[11px] font-bold text-gold md:hidden">
-            {xp} XP
+          <span className="font-arcade shrink-0 text-[9px] text-gold md:hidden">
+            {xp}XP
           </span>
         )}
 
@@ -70,9 +70,9 @@ export default function Navbar() {
               <div className="text-xs text-muted">{rankFor(xp)}</div>
             </div>
             <div className="w-32">
-              <div className="mb-1 flex justify-between font-mono text-[10px] text-muted">
-                <span className="text-gold">{xp} XP</span>
-                <span>{pct}%</span>
+              <div className="mb-1 flex items-center justify-between text-[10px] text-muted">
+                <span className="font-arcade text-[9px] text-gold">{xp}XP</span>
+                <span className="font-mono">{pct}%</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-surface-2">
                 <div

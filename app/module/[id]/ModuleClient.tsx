@@ -131,16 +131,16 @@ export default function ModuleClient() {
             Nível {node.level} — {LEVEL_NAMES[node.level]} · Módulo{" "}
             {node.module}
           </p>
-          <h1 className="mt-1 text-2xl font-bold">
+          <h1 className="font-display mt-1 text-2xl font-bold">
             {node.icon} {node.title}
           </h1>
           <p className="mt-2 text-sm text-muted">{node.summary}</p>
         </div>
         <div className="panel shrink-0 px-4 py-2 text-center">
-          <div className="font-mono text-lg font-bold text-gold">
+          <div className="font-arcade text-sm text-gold">
             {xpWithBonus(node.id, specClass)}
           </div>
-          <div className="text-[10px] uppercase text-muted">XP</div>
+          <div className="mt-1 text-[10px] uppercase text-muted">XP</div>
         </div>
       </div>
 

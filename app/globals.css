@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #060910;
+  --background: #05070d;
   --surface: #0b101c;
   --surface-2: #101728;
-  --border: #1d2740;
-  --foreground: #d7e2f4;
-  --muted: #7d8cab;
+  --border: #1e2a45;
+  --foreground: #dbe6f7;
+  --muted: #8294b5;
   --neon: #22d3ee;
   --neon-2: #e879f9;
   --success: #34d399;
@@ -32,11 +32,50 @@
 
 body {
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(34, 211, 238, 0.08), transparent),
-    radial-gradient(ellipse 60% 40% at 90% 110%, rgba(232, 121, 249, 0.06), transparent),
+    radial-gradient(50rem 30rem at 12% -8%, rgba(34, 211, 238, 0.1), transparent),
+    radial-gradient(42rem 28rem at 108% 12%, rgba(232, 121, 249, 0.07), transparent),
+    radial-gradient(64rem 40rem at 50% 118%, rgba(34, 211, 238, 0.05), transparent),
     var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Tipografia de personalidade */
+.font-display {
+  font-family: var(--font-display), var(--font-geist-sans), sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.font-arcade {
+  font-family: var(--font-arcade), var(--font-geist-mono), monospace;
+}
+
+/* Seleção e foco com identidade */
+::selection {
+  background: rgba(34, 211, 238, 0.3);
+}
+
+:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Scrollbars finas do console */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c2740;
+  border-radius: 8px;
+  border: 2px solid var(--background);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2c3d63;
 }
 
 /* Área segura para PWA em tela cheia (notch/status bar do iOS) */
@@ -55,11 +94,97 @@ body {
   text-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
 }
 
+/* Título com gradiente + brilho */
+.glow-grad {
+  background: linear-gradient(100deg, var(--neon) 10%, #7deffc 45%, var(--neon-2) 95%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.35));
+}
+
+/* Painel padrão: superfície com profundidade e brilho interno no topo */
 .panel {
-  background: var(--surface);
+  background: linear-gradient(180deg, #0d1526 0%, #0a0f1b 100%);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
+  box-shadow:
+    inset 0 1px 0 rgba(219, 230, 247, 0.05),
+    0 8px 28px -16px rgba(0, 0, 0, 0.85);
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
+
+/* Botão primário do jogo */
+.btn-primary {
+  background: linear-gradient(135deg, #1fc9e4 0%, #38e0f7 55%, #7deffc 120%);
+  color: var(--background);
+  box-shadow:
+    0 0 26px -8px rgba(34, 211, 238, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: transform 0.15s, filter 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 36px -8px rgba(34, 211, 238, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.btn-primary:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Herói: hexágono com anel orbital — assinatura da marca */
+.hero-hex {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 6rem;
+  height: 6rem;
+  font-size: 4rem;
+  line-height: 1;
+  color: var(--neon);
+  text-shadow:
+    0 0 24px rgba(34, 211, 238, 0.9),
+    0 0 80px rgba(34, 211, 238, 0.5);
+}
+.hero-hex::before {
+  content: "";
+  position: absolute;
+  inset: -0.9rem;
+  border: 1px dashed rgba(34, 211, 238, 0.4);
+  border-radius: 50%;
+  animation: orbit 16s linear infinite;
+}
+.hero-hex::after {
+  content: "◆";
+  position: absolute;
+  top: -1.25rem;
+  left: 50%;
+  margin-left: -0.375rem;
+  font-size: 0.75rem;
+  color: var(--neon-2);
+  text-shadow: 0 0 10px rgba(232, 121, 249, 0.8);
+  animation: orbit-sat 16s linear infinite;
+  transform-origin: 0.375rem 4.25rem;
+}
+
+@keyframes orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes orbit-sat {
+  to { transform: rotate(-360deg); }
+}
+
+/* Entrada suave do herói */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+.rise { animation: rise 0.55s ease-out both; }
+.rise-2 { animation: rise 0.55s ease-out 0.1s both; }
+.rise-3 { animation: rise 0.55s ease-out 0.2s both; }
 
 @keyframes pulse-border {
   0%, 100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.45); border-color: var(--neon); }
@@ -88,6 +213,15 @@ body {
   content: "▌";
   animation: blink-cursor 1s step-end infinite;
   color: var(--neon);
+}
+
+/* Acessibilidade: reduz movimento quando o sistema pedir */
+@media (prefers-reduced-motion: reduce) {
+  .rise, .rise-2, .rise-3,
+  .hero-hex::before, .hero-hex::after,
+  .node-available, .toast-in {
+    animation: none;
+  }
 }
 
 /* React Flow dark overrides */
