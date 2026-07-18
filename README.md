@@ -1,4 +1,4 @@
-# N8N Agentic Academy
+# Robbu Game N8N
 
 Plataforma web gamificada de treinamento avançado em **Inteligência Artificial, RAG e orquestração de agentes no n8n** — ideias para iniciantes e times inteiros dominarem os Nós Advanced AI (LangChain) aplicados a chatbots de **WhatsApp**.
 
