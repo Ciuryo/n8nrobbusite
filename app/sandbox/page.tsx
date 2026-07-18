@@ -40,6 +40,7 @@ import { simulate, type LogStep } from "@/lib/simulator";
 import { useAcademy } from "@/lib/store";
 import { fireConfetti } from "@/lib/confetti";
 import { getNode } from "@/lib/curriculum";
+import { loadProjectChallenge } from "@/lib/architect";
 
 const nodeTypes = { academy: FlowNode };
 
@@ -101,7 +102,20 @@ function SandboxInner() {
   const [challengeId, setChallengeId] = useState<string>(
     () => searchParams.get("challenge") ?? ""
   );
-  const challenge = challengeId ? getChallenge(challengeId) : null;
+  // desafio dinâmico do Arquiteto de Projetos (carrega no cliente)
+  const [projectChallenge, setProjectChallenge] = useState<Challenge | null>(
+    null
+  );
+  useEffect(() => {
+    setProjectChallenge(loadProjectChallenge());
+  }, []);
+
+  const challenge =
+    challengeId === "meu-projeto"
+      ? projectChallenge
+      : challengeId
+        ? getChallenge(challengeId)
+        : null;
 
   // Restaura o canvas salvo (ou o fluxo quebrado do desafio de conserto)
   const restored = useRef(false);
@@ -334,6 +348,12 @@ function SandboxInner() {
           className="rounded-md border border-edge bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-neon"
         >
           <option value="">Modo livre (sem desafio)</option>
+          {projectChallenge && (
+            <option value="meu-projeto">
+              {completedChallenges.includes("meu-projeto") ? "✔ " : "🚀 "}
+              Meu Projeto (+{projectChallenge.xp} XP)
+            </option>
+          )}
           {ORDERED_CHALLENGES.map((c) => {
             const rec = c.recommendedAfter ? getNode(c.recommendedAfter) : null;
             return (

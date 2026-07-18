@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/", label: "Base" },
   { href: "/skills", label: "Árvore de Habilidades" },
   { href: "/sandbox", label: "Sandbox" },
+  { href: "/projeto", label: "Meu Projeto" },
   { href: "/team", label: "Painel do Gestor" },
 ];
 

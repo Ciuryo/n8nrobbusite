@@ -29,6 +29,12 @@ const FEATURES = [
     href: "/sandbox",
   },
   {
+    icon: "🚀",
+    title: "Meu Projeto",
+    desc: "Descreva a SUA ideia e o Arquiteto desenha o fluxo n8n ideal: blocos, justificativas, trilha de estudo e prática no Sandbox.",
+    href: "/projeto",
+  },
+  {
     icon: "📊",
     title: "Painel do Gestor",
     desc: "Matriz de competências em radar, leaderboard e métricas: acerto de primeira tentativa e consumo de tokens simulados.",
@@ -254,7 +260,7 @@ export default function Home() {
         </div>
 
         {/* Pilares */}
-        <div className="mt-16 grid gap-4 md:grid-cols-3">
+        <div className="mt-16 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((f) => (
             <Link
               key={f.href}

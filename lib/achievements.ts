@@ -96,6 +96,13 @@ export const ACHIEVEMENTS: Achievement[] = [
     earned: (s) => s.streakDays >= 7,
   },
   {
+    id: "visionario",
+    icon: "🚀",
+    title: "Visionário",
+    desc: "Monte o blueprint do SEU projeto no Sandbox.",
+    earned: (s) => s.completedChallenges.includes("meu-projeto"),
+  },
+  {
     id: "boss-vencido",
     icon: "👑",
     title: "Caçador de Boss",
