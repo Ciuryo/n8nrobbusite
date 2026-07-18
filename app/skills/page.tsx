@@ -53,6 +53,13 @@ export default function SkillsPage() {
   const width = PAD_X * 2 + cols * CELL_W;
   const height = PAD_Y * 2 + 3 * CELL_H;
 
+  // Próximo nó sugerido: o disponível de menor nível/módulo
+  const suggested = SKILL_TREE.filter(
+    (n) => nodeState(n, completedNodes) === "available"
+  ).sort(
+    (a, b) => a.level - b.level || a.module.localeCompare(b.module)
+  )[0];
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="mx-auto w-full max-w-7xl px-4 pt-8">
@@ -127,6 +134,11 @@ export default function SkillsPage() {
               <div
                 className={`relative flex h-full flex-col rounded-lg border-2 p-2.5 transition ${STATE_STYLE[state]}`}
               >
+                {suggested?.id === node.id && (
+                  <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-neon px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-background shadow-[0_0_14px_rgba(34,211,238,0.5)]">
+                    ▶ {completedNodes.length === 0 ? "comece aqui" : "continue aqui"}
+                  </span>
+                )}
                 <div className="flex items-start justify-between">
                   <span className="font-mono text-lg">{node.icon}</span>
                   <span className="font-mono text-[10px] text-muted">

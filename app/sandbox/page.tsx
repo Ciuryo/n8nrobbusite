@@ -155,13 +155,18 @@ function SandboxInner() {
   function validateChallenge() {
     if (!challenge) return;
     const result = challenge.validate(graph);
-    setValidation(result);
     if (result.ok) {
-      if (!completedChallenges.includes(challenge.id)) {
+      const isNew = !completedChallenges.includes(challenge.id);
+      // runFlow limpa validation/awarded — setar depois para o painel de
+      // recompensa permanecer visível durante a simulação
+      runFlow();
+      setValidation(result);
+      if (isNew) {
         completeChallenge(challenge.id, challenge.xp);
         setAwarded(challenge.xp);
       }
-      runFlow();
+    } else {
+      setValidation(result);
     }
   }
 
@@ -247,6 +252,9 @@ function SandboxInner() {
           <span className="ml-2 font-mono text-muted">
             Critérios: {challenge.acceptance.join(" · ")}
           </span>
+          {challenge.hint && !challengeDone && (
+            <div className="mt-1 text-neon">💡 {challenge.hint}</div>
+          )}
         </div>
       )}
 
@@ -303,11 +311,25 @@ function SandboxInner() {
           {nodes.length === 0 && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <p className="max-w-sm text-center text-sm text-muted">
-                Adicione nós pela paleta à esquerda e arraste as conexões.
+                Clique em um nó na paleta à esquerda para adicioná-lo ao canvas
+                e arraste as conexões entre as portas.
                 <br />
                 <span className="font-mono text-xs">
-                  Portas de baixo (Model/Memory/Tool) recebem os sub-nós de IA.
+                  Fluxo principal: portas laterais (→). Sub-nós de IA: portas de
+                  baixo (Model/Memory/Tool).
                 </span>
+                {!challenge && (
+                  <>
+                    <br />
+                    <span className="text-xs">
+                      💡 Primeira vez aqui? Selecione o desafio{" "}
+                      <span className="text-neon-2">
+                        ◆ Fluxo de Eco
+                      </span>{" "}
+                      na barra acima.
+                    </span>
+                  </>
+                )}
               </p>
             </div>
           )}

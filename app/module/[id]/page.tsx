@@ -3,9 +3,40 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getNode, nodeState, LEVEL_NAMES } from "@/lib/curriculum";
+import { getNode, nodeState, LEVEL_NAMES, SKILL_TREE } from "@/lib/curriculum";
 import { CHALLENGES } from "@/lib/challenges";
 import { useAcademy, xpWithBonus } from "@/lib/store";
+
+function NextStep({
+  completedNodes,
+  onMap,
+}: {
+  completedNodes: string[];
+  onMap: () => void;
+}) {
+  const next = SKILL_TREE.filter(
+    (n) => nodeState(n, completedNodes) === "available"
+  ).sort((a, b) => a.level - b.level || a.module.localeCompare(b.module))[0];
+
+  return (
+    <div className="mt-8 flex flex-col items-center gap-3 text-center">
+      {next && (
+        <Link
+          href={`/module/${next.id}`}
+          className="rounded-md bg-neon px-6 py-3 font-semibold text-background transition hover:brightness-110"
+        >
+          Próximo módulo: {next.icon} {next.title} →
+        </Link>
+      )}
+      <button
+        onClick={onMap}
+        className="rounded-md border border-gold px-6 py-3 font-semibold text-gold hover:bg-gold/10"
+      >
+        🏅 {next ? "Ver o mapa de habilidades" : "Voltar ao mapa — trilha completa!"}
+      </button>
+    </div>
+  );
+}
 
 export default function ModulePage() {
   const { id } = useParams<{ id: string }>();
@@ -236,14 +267,7 @@ export default function ModulePage() {
       </section>
 
       {isCompleted && (
-        <div className="mt-8 text-center">
-          <button
-            onClick={() => router.push("/skills")}
-            className="rounded-md border border-gold px-6 py-3 font-semibold text-gold hover:bg-gold/10"
-          >
-            🏅 Voltar ao mapa e desbloquear próximos nós
-          </button>
-        </div>
+        <NextStep completedNodes={completedNodes} onMap={() => router.push("/skills")} />
       )}
     </div>
   );

@@ -65,6 +65,7 @@ export interface SkillNode {
 }
 
 export const LEVEL_NAMES: Record<number, string> = {
+  0: "Introdução — Bem-vindo ao n8n",
   1: "Fundamentos de Automação e Mensageria",
   2: "Engenharia de Prompts e Contexto",
   3: "RAG Profundo e Ingestão Vetorial",
@@ -74,6 +75,147 @@ export const LEVEL_NAMES: Record<number, string> = {
 };
 
 export const SKILL_TREE: SkillNode[] = [
+  {
+    id: "n8n-basics",
+    module: "0.1",
+    level: 0,
+    title: "O que é o n8n? Nós, Gatilhos e Fluxos",
+    icon: "🧭",
+    summary:
+      "Ponto de partida para quem nunca automatizou nada: o que o n8n faz, o que são nós e como um fluxo ganha vida.",
+    topics: [
+      {
+        heading: "Automação visual: o que o n8n faz",
+        body: "O n8n é uma ferramenta de automação onde você monta fluxos (workflows) conectando blocos chamados nós (nodes) em um canvas — sem precisar programar para começar. Cada nó faz UMA coisa: recebe uma mensagem, consulta uma planilha, chama uma IA, envia um e-mail. Ligando nós em sequência, você constrói processos inteiros que rodam sozinhos.",
+      },
+      {
+        heading: "Trigger: todo fluxo começa com um gatilho",
+        body: "Um fluxo nunca roda 'do nada': ele é disparado por um nó de gatilho (Trigger) — um webhook que recebe uma mensagem, um horário agendado ou um clique manual em 'Executar'. Nesta academia, o gatilho principal é o WhatsApp Trigger: cada mensagem de cliente que chega dispara o fluxo uma vez.",
+      },
+      {
+        heading: "Nós de ação e o fluxo principal",
+        body: "Depois do gatilho vêm os nós de ação, que transformam ou enviam dados. Eles se conectam pela linha do fluxo principal (main): os dados saem pela direita de um nó e entram pela esquerda do próximo, sempre da esquerda para a direita. Se um nó falha, a execução para nele e o erro fica visível em vermelho — você sabe exatamente ONDE quebrou.",
+      },
+      {
+        heading: "Executar e inspecionar: o superpoder do n8n",
+        body: "No n8n você executa o fluxo e clica em qualquer nó para ver o dado que ENTROU e o que SAIU dele. Essa inspeção passo a passo é a habilidade nº 1 de quem constrói automações: quase todo bug se resolve olhando o dado real entre dois nós. O terminal do nosso Sandbox reproduz exatamente essa experiência.",
+      },
+    ],
+    quiz: [
+      {
+        question: "O que é um 'nó' (node) no n8n?",
+        options: [
+          "Um bloco que executa uma ação específica dentro do fluxo",
+          "Um servidor onde o n8n é instalado",
+          "Um arquivo de configuração do sistema",
+          "Um usuário cadastrado na plataforma",
+        ],
+        answer: 0,
+        explanation:
+          "Nós são os blocos de construção: cada um faz uma tarefa e passa o resultado adiante pela conexão.",
+      },
+      {
+        question:
+          "Qual tipo de nó é obrigatório para um fluxo iniciar sozinho quando algo acontece?",
+        options: [
+          "Um nó de gatilho (Trigger)",
+          "Um nó Code",
+          "Um nó de IA",
+          "Nenhum — fluxos rodam continuamente",
+        ],
+        answer: 0,
+        explanation:
+          "O Trigger é o ponto de entrada: webhook, agendamento ou execução manual. Sem ele, nada dispara o fluxo.",
+      },
+      {
+        question:
+          "Na prática, como você descobre por que um fluxo do n8n quebrou?",
+        options: [
+          "Clicando nos nós para inspecionar a entrada e a saída de cada um",
+          "Reinstalando o n8n",
+          "Aumentando a temperatura do modelo",
+          "Apagando o fluxo e recomeçando do zero",
+        ],
+        answer: 0,
+        explanation:
+          "A execução mostra o dado real em cada nó — inspecionar essa trilha é o jeito profissional de depurar.",
+      },
+    ],
+    deps: [],
+    xp: 60,
+    pos: { col: 0, row: 0 },
+  },
+  {
+    id: "first-workflow",
+    module: "0.2",
+    level: 0,
+    title: "Seu Primeiro Fluxo: Eco no WhatsApp",
+    icon: "🐣",
+    summary:
+      "Monte no Sandbox o menor fluxo útil que existe — receber uma mensagem e respondê-la — antes de qualquer IA.",
+    topics: [
+      {
+        heading: "A receita mínima: Gatilho → Ação",
+        body: "O menor fluxo útil tem apenas dois nós: um gatilho e uma ação. No nosso caso, o WhatsApp Trigger recebe a mensagem do cliente e o WhatsApp Send devolve uma resposta. Nenhuma IA envolvida ainda — primeiro você domina o transporte do dado; o 'cérebro' entra depois, exatamente entre esses dois nós.",
+      },
+      {
+        heading: "Conectando as portas certas",
+        body: "No canvas, as portas do fluxo principal ficam nas laterais dos nós: saída à direita (→) e entrada à esquerda. Para conectar, arraste da saída de um nó até a entrada do outro. Os nós de IA Avançada também têm portas coloridas embaixo (Model, Memory, Tool) — você vai usá-las nos próximos níveis; por enquanto, só o fluxo principal importa.",
+      },
+      {
+        heading: "Executar e ler o resultado",
+        body: "Ao executar, acompanhe as duas janelas do Sandbox: o widget de WhatsApp mostra a conversa como o CLIENTE a vê, e o terminal mostra cada passo interno — webhook recebido, dado repassado, resposta enviada. Criar o hábito de ler o terminal agora vai te salvar horas quando os fluxos ficarem complexos.",
+      },
+      {
+        heading: "Para onde vamos a partir daqui",
+        body: "Este eco é o esqueleto de TODO chatbot que você vai construir na academia: nos próximos níveis você aprende a manipular o dado que trafega (JSON), a entender o webhook de verdade e, então, a encaixar um AI Agent entre o Trigger e o Send — transformando o eco burro em um agente autônomo com memória, RAG e ferramentas.",
+      },
+    ],
+    quiz: [
+      {
+        question:
+          "Qual é o fluxo mínimo para responder uma mensagem no WhatsApp via n8n?",
+        options: [
+          "WhatsApp Trigger → WhatsApp Send",
+          "AI Agent → Vector Store → Redis",
+          "Code → Code → Code",
+          "Apenas o WhatsApp Trigger, que responde sozinho",
+        ],
+        answer: 0,
+        explanation:
+          "Gatilho para receber + ação para enviar: todo o resto do curso é enriquecer o que acontece entre os dois.",
+      },
+      {
+        question:
+          "Em que direção os dados percorrem o fluxo principal (main) no canvas?",
+        options: [
+          "Da saída (direita) de um nó para a entrada (esquerda) do próximo",
+          "De cima para baixo, pelas portas coloridas",
+          "Em qualquer direção, o n8n decide sozinho",
+          "Da entrada para a saída do mesmo nó, em círculo",
+        ],
+        answer: 0,
+        explanation:
+          "O fluxo principal corre da esquerda para a direita; as portas de baixo são para sub-nós de IA (Model/Memory/Tool).",
+      },
+      {
+        question: "O que o widget de WhatsApp do Sandbox representa?",
+        options: [
+          "A conversa exatamente como o cliente a vê no celular",
+          "O log interno do servidor n8n",
+          "O consumo de tokens do modelo",
+          "A configuração do webhook na Meta",
+        ],
+        answer: 0,
+        explanation:
+          "O widget simula a perspectiva do cliente; os bastidores técnicos aparecem no terminal ao lado.",
+      },
+    ],
+    deps: ["n8n-basics"],
+    xp: 80,
+    challengeId: "eco-bot",
+    pos: { col: 1, row: 0 },
+  },
   {
     id: "json-mastery",
     module: "1.1",
@@ -141,9 +283,9 @@ export const SKILL_TREE: SkillNode[] = [
           "Em 'Run Once for All Items' a variável items contém o array completo, ideal para agregações.",
       },
     ],
-    deps: [],
+    deps: ["first-workflow"],
     xp: 100,
-    pos: { col: 0, row: 0 },
+    pos: { col: 2, row: 0 },
   },
   {
     id: "webhooks-whatsapp",
@@ -209,7 +351,7 @@ export const SKILL_TREE: SkillNode[] = [
     ],
     deps: ["json-mastery"],
     xp: 120,
-    pos: { col: 1, row: 0 },
+    pos: { col: 3, row: 0 },
   },
   {
     id: "llm-nodes",
@@ -274,7 +416,7 @@ export const SKILL_TREE: SkillNode[] = [
     ],
     deps: ["webhooks-whatsapp"],
     xp: 140,
-    pos: { col: 2, row: 0 },
+    pos: { col: 4, row: 0 },
   },
   {
     id: "prompt-engineering",
@@ -345,7 +487,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["llm-nodes"],
     xp: 150,
     bonusClass: "prompt-engineer",
-    pos: { col: 3, row: 0 },
+    pos: { col: 5, row: 0 },
   },
   {
     id: "document-loaders",
@@ -415,7 +557,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["prompt-engineering"],
     xp: 160,
     bonusClass: "rag-engineer",
-    pos: { col: 4, row: -1 },
+    pos: { col: 6, row: -1 },
   },
   {
     id: "vector-stores",
@@ -480,7 +622,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["document-loaders"],
     xp: 170,
     bonusClass: "rag-engineer",
-    pos: { col: 5, row: -1 },
+    pos: { col: 7, row: -1 },
   },
   {
     id: "retrieval",
@@ -545,7 +687,7 @@ export const SKILL_TREE: SkillNode[] = [
     xp: 180,
     bonusClass: "rag-engineer",
     challengeId: "rag-pipeline",
-    pos: { col: 6, row: -1 },
+    pos: { col: 8, row: -1 },
   },
   {
     id: "memory-types",
@@ -614,7 +756,7 @@ export const SKILL_TREE: SkillNode[] = [
     ],
     deps: ["llm-nodes"],
     xp: 160,
-    pos: { col: 4, row: 1 },
+    pos: { col: 6, row: 1 },
   },
   {
     id: "session-persistence",
@@ -685,7 +827,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["memory-types", "webhooks-whatsapp"],
     xp: 170,
     challengeId: "memoria-persistente",
-    pos: { col: 5, row: 1 },
+    pos: { col: 7, row: 1 },
   },
   {
     id: "custom-tools",
@@ -757,7 +899,7 @@ export const SKILL_TREE: SkillNode[] = [
     xp: 190,
     bonusClass: "agent-architect",
     challengeId: "custom-tool-frete",
-    pos: { col: 5, row: 0 },
+    pos: { col: 7, row: 0 },
   },
   {
     id: "ai-agent",
@@ -827,7 +969,7 @@ export const SKILL_TREE: SkillNode[] = [
     xp: 220,
     bonusClass: "agent-architect",
     challengeId: "agente-whatsapp",
-    pos: { col: 6, row: 0 },
+    pos: { col: 8, row: 0 },
   },
   {
     id: "error-handling",
@@ -897,7 +1039,7 @@ export const SKILL_TREE: SkillNode[] = [
     ],
     deps: ["ai-agent"],
     xp: 200,
-    pos: { col: 7, row: 1 },
+    pos: { col: 9, row: 1 },
   },
   {
     id: "guardrails",
@@ -967,7 +1109,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["ai-agent", "retrieval"],
     xp: 220,
     bonusClass: "prompt-engineer",
-    pos: { col: 7, row: -1 },
+    pos: { col: 9, row: -1 },
   },
 ];
 
@@ -990,9 +1132,10 @@ export function nodeState(
 
 /** Ranks por XP acumulado */
 export const RANKS = [
-  { min: 0, name: "Estagiário de Automação" },
-  { min: 200, name: "Operador de Webhooks" },
-  { min: 500, name: "Engenheiro de Fluxos" },
+  { min: 0, name: "Recruta do n8n" },
+  { min: 140, name: "Estagiário de Automação" },
+  { min: 400, name: "Operador de Webhooks" },
+  { min: 700, name: "Engenheiro de Fluxos" },
   { min: 900, name: "Especialista em RAG" },
   { min: 1400, name: "Orquestrador de Agentes" },
   { min: 1800, name: "Arquiteto Agêntico" },
