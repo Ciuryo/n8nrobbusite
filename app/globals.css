@@ -70,6 +70,15 @@ body {
   animation: pulse-border 1.8s ease-in-out infinite;
 }
 
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.toast-in {
+  animation: toast-in 0.25s ease-out;
+}
+
 @keyframes blink-cursor {
   0%, 49% { opacity: 1; }
   50%, 100% { opacity: 0; }

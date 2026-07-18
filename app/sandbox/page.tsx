@@ -1,6 +1,13 @@
 "use client";
 
-import { Suspense, useCallback, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import {
   ReactFlow,
@@ -22,17 +29,44 @@ import WhatsAppWidget, {
 } from "@/components/sandbox/WhatsAppWidget";
 import ExecutionTerminal from "@/components/sandbox/ExecutionTerminal";
 import { NODE_CATALOG, compileGraph, type Graph } from "@/lib/sandbox";
-import { CHALLENGES, getChallenge, type ValidationResult } from "@/lib/challenges";
+import {
+  CHALLENGES,
+  getChallenge,
+  type Challenge,
+  type ValidationResult,
+} from "@/lib/challenges";
 import { simulate, type LogStep } from "@/lib/simulator";
 import { useAcademy } from "@/lib/store";
+import { fireConfetti } from "@/lib/confetti";
 
 const nodeTypes = { academy: FlowNode };
 
 const CATEGORIES = [...new Set(NODE_CATALOG.map((c) => c.category))];
 
+const CANVAS_KEY = "robbu-sandbox-canvas";
+
 function kindOf(handle: string | null | undefined): string | null {
   if (!handle) return null;
   return handle.replace(/^(in|out)-/, "");
+}
+
+/** converte o setup de um desafio de conserto em nós/arestas do React Flow */
+function setupToFlow(ch: Challenge) {
+  const nodes: AcademyNode[] = (ch.setup?.nodes ?? []).map((n) => ({
+    id: n.id,
+    type: "academy" as const,
+    position: { x: n.x, y: n.y },
+    data: { ctype: n.type },
+  }));
+  const edges: Edge[] = (ch.setup?.edges ?? []).map((e, i) => ({
+    id: `setup-${i}`,
+    source: e.source,
+    target: e.target,
+    sourceHandle: e.sourceHandle,
+    targetHandle: e.targetHandle,
+    animated: kindOf(e.sourceHandle) !== "main",
+  }));
+  return { nodes, edges };
 }
 
 function SandboxInner() {
@@ -47,6 +81,45 @@ function SandboxInner() {
     () => searchParams.get("challenge") ?? ""
   );
   const challenge = challengeId ? getChallenge(challengeId) : null;
+
+  // Restaura o canvas salvo (ou o fluxo quebrado do desafio de conserto)
+  const restored = useRef(false);
+  useEffect(() => {
+    if (restored.current) return;
+    restored.current = true;
+    const initial = challengeId ? getChallenge(challengeId) : null;
+    if (initial?.setup) {
+      const { nodes: n, edges: e } = setupToFlow(initial);
+      setNodes(n);
+      setEdges(e);
+      return;
+    }
+    try {
+      const raw = localStorage.getItem(CANVAS_KEY);
+      if (raw) {
+        const data = JSON.parse(raw);
+        if (Array.isArray(data.nodes)) setNodes(data.nodes);
+        if (Array.isArray(data.edges)) setEdges(data.edges);
+        idRef.current = data.idc ?? data.nodes?.length ?? 0;
+      }
+    } catch {
+      /* canvas salvo corrompido: começa vazio */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-salva o canvas a cada mudança
+  useEffect(() => {
+    if (!restored.current) return;
+    try {
+      localStorage.setItem(
+        CANVAS_KEY,
+        JSON.stringify({ nodes, edges, idc: idRef.current })
+      );
+    } catch {
+      /* armazenamento cheio: segue sem salvar */
+    }
+  }, [nodes, edges]);
 
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [logSteps, setLogSteps] = useState<LogStep[]>([]);
@@ -68,6 +141,12 @@ function SandboxInner() {
       })),
     }),
     [nodes, edges]
+  );
+
+  // Checklist ao vivo: critérios do desafio conferidos a cada mudança no grafo
+  const liveChecks = useMemo(
+    () => (challenge ? challenge.validate(graph) : null),
+    [challenge, graph]
   );
 
   const addNode = useCallback(
@@ -117,7 +196,7 @@ function SandboxInner() {
     timers.current = [];
   }
 
-  function runFlow() {
+  function runFlow(messageOverride?: string) {
     clearTimers();
     setValidation(null);
     setAwarded(null);
@@ -126,7 +205,7 @@ function SandboxInner() {
     setLogSteps([]);
     setRunning(true);
 
-    const result = simulate(graph, challenge);
+    const result = simulate(graph, challenge, messageOverride);
     let t = 400;
     timers.current.push(
       setTimeout(() => {
@@ -164,6 +243,7 @@ function SandboxInner() {
       if (isNew) {
         completeChallenge(challenge.id, challenge.xp);
         setAwarded(challenge.xp);
+        fireConfetti(challenge.id === "boss-final" ? 180 : 90);
       }
     } else {
       setValidation(result);
@@ -182,6 +262,36 @@ function SandboxInner() {
     setTyping(false);
   }
 
+  function selectChallenge(id: string) {
+    setChallengeId(id);
+    setValidation(null);
+    setAwarded(null);
+    // desafio de conserto: carrega o fluxo quebrado no canvas
+    const ch = id ? getChallenge(id) : null;
+    if (ch?.setup) {
+      clearTimers();
+      const { nodes: n, edges: e } = setupToFlow(ch);
+      setNodes(n);
+      setEdges(e);
+      setChat([]);
+      setLogSteps([]);
+      setRunning(false);
+      setTyping(false);
+    }
+  }
+
+  function exportJson() {
+    const blob = new Blob([JSON.stringify(compileGraph(graph), null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "fluxo-robbugamen8n.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const challengeDone = challenge
     ? completedChallenges.includes(challenge.id)
     : false;
@@ -195,11 +305,7 @@ function SandboxInner() {
         </label>
         <select
           value={challengeId}
-          onChange={(e) => {
-            setChallengeId(e.target.value);
-            setValidation(null);
-            setAwarded(null);
-          }}
+          onChange={(e) => selectChallenge(e.target.value)}
           className="rounded-md border border-edge bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-neon"
         >
           <option value="">Modo livre (sem desafio)</option>
@@ -219,13 +325,21 @@ function SandboxInner() {
             {"{ } JSON"}
           </button>
           <button
+            onClick={exportJson}
+            disabled={nodes.length === 0}
+            title="Baixa o fluxo em JSON para importar no n8n de verdade (menu ⋯ → Import from File)"
+            className="rounded-md border border-edge px-3 py-1.5 text-xs text-muted hover:text-neon disabled:opacity-40"
+          >
+            ⬇ Exportar p/ n8n
+          </button>
+          <button
             onClick={resetCanvas}
             className="rounded-md border border-edge px-3 py-1.5 text-xs text-muted hover:text-danger"
           >
             🗑 Limpar
           </button>
           <button
-            onClick={runFlow}
+            onClick={() => runFlow()}
             disabled={running || nodes.length === 0}
             className="rounded-md bg-neon px-4 py-1.5 text-xs font-bold text-background hover:brightness-110 disabled:opacity-40"
           >
@@ -235,7 +349,9 @@ function SandboxInner() {
             <button
               onClick={validateChallenge}
               disabled={running || nodes.length === 0}
-              className="rounded-md bg-neon-2 px-4 py-1.5 text-xs font-bold text-background hover:brightness-110 disabled:opacity-40"
+              className={`rounded-md bg-neon-2 px-4 py-1.5 text-xs font-bold text-background hover:brightness-110 disabled:opacity-40 ${
+                liveChecks?.ok && !challengeDone ? "animate-pulse" : ""
+              }`}
             >
               ✔ Validar Desafio
             </button>
@@ -243,16 +359,25 @@ function SandboxInner() {
         </div>
       </div>
 
-      {/* Briefing do desafio */}
+      {/* Briefing do desafio + checklist ao vivo */}
       {challenge && (
         <div className="border-b border-edge bg-surface-2/50 px-4 py-2 text-xs">
           <span className="font-semibold text-neon-2">◆ {challenge.title}</span>
           {challengeDone && <span className="ml-2 text-success">✔ concluído</span>}
           <span className="ml-2 text-muted">{challenge.brief}</span>
-          <span className="ml-2 font-mono text-muted">
-            Critérios: {challenge.acceptance.join(" · ")}
-          </span>
-          {challenge.hint && !challengeDone && (
+          <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px]">
+            {(liveChecks?.checks ?? []).map((c, i) => (
+              <span key={i} className={c.pass ? "text-success" : "text-muted"}>
+                {c.pass ? "✔" : "○"} {c.label}
+              </span>
+            ))}
+            {liveChecks?.ok && !challengeDone && (
+              <span className="font-bold text-neon-2">
+                ← tudo verde! Clique em ✔ Validar Desafio
+              </span>
+            )}
+          </div>
+          {challenge.hint && !challengeDone && !liveChecks?.ok && (
             <div className="mt-1 text-neon">💡 {challenge.hint}</div>
           )}
         </div>
@@ -385,7 +510,12 @@ function SandboxInner() {
         {/* Simulador — embaixo no celular, lateral no desktop */}
         <aside className="flex w-full shrink-0 flex-col gap-2 border-t border-edge bg-surface p-2 lg:w-80 lg:border-l lg:border-t-0 xl:w-96">
           <div className="min-h-0 flex-[3] max-lg:h-80 max-lg:flex-none">
-            <WhatsAppWidget messages={chat} typing={typing} />
+            <WhatsAppWidget
+              messages={chat}
+              typing={typing}
+              onSend={(text) => runFlow(text)}
+              disabled={running || nodes.length === 0}
+            />
           </div>
           <div className="min-h-0 flex-[2] max-lg:h-56 max-lg:flex-none">
             <ExecutionTerminal steps={logSteps} running={running} />

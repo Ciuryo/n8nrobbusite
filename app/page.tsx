@@ -10,6 +10,7 @@ import {
   nodeState,
 } from "@/lib/curriculum";
 import { CHALLENGES } from "@/lib/challenges";
+import { ACHIEVEMENTS, earnedAchievements } from "@/lib/achievements";
 import { useAcademy } from "@/lib/store";
 
 const FEATURES = [
@@ -34,13 +35,30 @@ const FEATURES = [
 ];
 
 export default function Home() {
-  const { hydrated, onboarded, name, xp, specClass, completedNodes } =
-    useAcademy();
+  const {
+    hydrated,
+    onboarded,
+    name,
+    xp,
+    specClass,
+    completedNodes,
+    completedChallenges,
+    firstTryPasses,
+    streakDays,
+  } = useAcademy();
   const classInfo = CLASSES.find((c) => c.id === specClass);
 
   const available = SKILL_TREE.filter(
     (n) => nodeState(n, completedNodes) === "available"
   );
+
+  const earned = earnedAchievements({
+    xp,
+    completedNodes,
+    completedChallenges,
+    firstTryPasses,
+    streakDays,
+  });
 
   return (
     <div className="grid-bg flex-1">
@@ -119,6 +137,46 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Sala de Troféus */}
+        {hydrated && onboarded && (
+          <div className="mt-16">
+            <h2 className="text-center text-xl font-bold">🏆 Sala de Troféus</h2>
+            <p className="mt-1 text-center text-sm text-muted">
+              {earned.length}/{ACHIEVEMENTS.length} conquistas desbloqueadas
+              {streakDays >= 1 && (
+                <span className="ml-2 text-danger">
+                  · 🔥 {streakDays} dia{streakDays > 1 ? "s" : ""} de sequência
+                </span>
+              )}
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {ACHIEVEMENTS.map((a) => {
+                const ok = earned.includes(a.id);
+                return (
+                  <div
+                    key={a.id}
+                    className={`panel p-4 text-center transition ${
+                      ok
+                        ? "border-gold/60 shadow-[0_0_14px_rgba(251,191,36,0.15)]"
+                        : "opacity-45"
+                    }`}
+                  >
+                    <div className="text-3xl">{ok ? a.icon : "🔒"}</div>
+                    <div
+                      className={`mt-2 text-sm font-semibold ${ok ? "text-gold" : ""}`}
+                    >
+                      {a.title}
+                    </div>
+                    <div className="mt-1 text-xs leading-snug text-muted">
+                      {a.desc}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Como funciona (guia rápido para quem chega agora) */}
         <div className="mt-16">

@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import PwaRegister from "@/components/PwaRegister";
+import Toaster from "@/components/Toaster";
+import GameFeelWatcher from "@/components/GameFeelWatcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -50,8 +52,10 @@ export default function RootLayout({
     >
       <body className="flex min-h-screen flex-col">
         <PwaRegister />
+        <GameFeelWatcher />
         <Navbar />
         <main className="flex flex-1 flex-col">{children}</main>
+        <Toaster />
       </body>
     </html>
   );

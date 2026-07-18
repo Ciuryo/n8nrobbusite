@@ -14,7 +14,7 @@ const LINKS = [
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { hydrated, name, specClass, xp, onboarded } = useAcademy();
+  const { hydrated, name, specClass, xp, onboarded, streakDays } = useAcademy();
   const classInfo = CLASSES.find((c) => c.id === specClass);
   const pct = Math.min(100, Math.round((xp / TOTAL_XP) * 100));
 
@@ -45,6 +45,15 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
+
+        {hydrated && onboarded && streakDays >= 1 && (
+          <span
+            title={`${streakDays} dia(s) seguidos estudando`}
+            className="shrink-0 font-mono text-[11px] font-bold text-danger"
+          >
+            🔥{streakDays}
+          </span>
+        )}
 
         {hydrated && onboarded && (
           <span className="shrink-0 font-mono text-[11px] font-bold text-gold md:hidden">

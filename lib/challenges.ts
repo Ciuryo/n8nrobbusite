@@ -12,6 +12,17 @@ export interface ValidationResult {
   checks: { label: string; pass: boolean }[];
 }
 
+/** Fluxo pré-montado carregado no canvas (desafios de conserto) */
+export interface ChallengeSetup {
+  nodes: { id: string; type: string; x: number; y: number }[];
+  edges: {
+    source: string;
+    target: string;
+    sourceHandle: string;
+    targetHandle: string;
+  }[];
+}
+
 export interface Challenge {
   id: string;
   title: string;
@@ -24,6 +35,8 @@ export interface Challenge {
   acceptance: string[];
   /** dica exibida no Sandbox para orientar quem está travado */
   hint?: string;
+  /** fluxo defeituoso pré-carregado — o jogador precisa consertar */
+  setup?: ChallengeSetup;
   validate: (g: Graph) => ValidationResult;
 }
 
@@ -205,6 +218,143 @@ export const CHALLENGES: Challenge[] = [
     },
   },
 ];
+
+// ---------- Desafios de conserto (fluxo quebrado pré-carregado) ----------
+
+CHALLENGES.push(
+  {
+    id: "conserto-cerebro",
+    title: "🔧 Conserto: Agente Sem Cérebro",
+    brief:
+      "O bot caiu em produção! O fluxo parece completo, mas algo está desconectado. Execute, leia o erro no terminal e conserte.",
+    userMessage: "Oi, meu pedido chegou errado 😕",
+    botReply:
+      "Sinto muito pelo transtorno! 🙏 Já abri uma solicitação de troca do seu pedido. Pode me confirmar o número dele?",
+    xp: 150,
+    acceptance: [
+      "Fluxo completo do Trigger ao Send",
+      "AI Agent com Chat Model conectado na porta Model",
+    ],
+    hint:
+      "Clique em ▶ Executar Fluxo e leia o erro no terminal — ele aponta exatamente qual porta está vazia.",
+    setup: {
+      nodes: [
+        { id: "fx1", type: "whatsapp-trigger", x: 40, y: 100 },
+        { id: "fx2", type: "ai-agent", x: 300, y: 100 },
+        { id: "fx3", type: "whatsapp-send", x: 560, y: 100 },
+        // o Chat Model existe no canvas, mas ninguém o conectou…
+        { id: "fx4", type: "openai-model", x: 120, y: 300 },
+      ],
+      edges: [
+        { source: "fx1", target: "fx2", sourceHandle: "out-main", targetHandle: "in-main" },
+        { source: "fx2", target: "fx3", sourceHandle: "out-main", targetHandle: "in-main" },
+      ],
+    },
+    validate: (g) => {
+      const { checks } = baseChatChecks(g);
+      return { ok: checks.every((c) => c.pass), checks };
+    },
+  },
+  {
+    id: "conserto-rag",
+    title: "🔧 Conserto: RAG Sem Embeddings",
+    brief:
+      "O bot responde, mas inventa preços! O Vector Store está no lugar — falta a peça que vetoriza as consultas. Encontre e conecte.",
+    userMessage: "Qual o preço do Mouse Gamer Pro X?",
+    botReply:
+      "O Mouse Gamer Pro X custa R$ 189,90 à vista 🖱️ (fonte: catalogo-2026.pdf). Quer aproveitar e ver o frete?",
+    xp: 200,
+    acceptance: [
+      "Estrutura básica do chatbot (trigger → agente → send)",
+      "Vector Store conectado na porta Tool do agente",
+      "Embeddings conectado ao Vector Store",
+    ],
+    hint:
+      "Sem Embeddings o banco vetorial não sabe transformar a pergunta em vetor. Olhe o nó solto no canvas e a porta Embedding do Qdrant.",
+    setup: {
+      nodes: [
+        { id: "fr1", type: "whatsapp-trigger", x: 40, y: 100 },
+        { id: "fr2", type: "ai-agent", x: 300, y: 100 },
+        { id: "fr3", type: "whatsapp-send", x: 560, y: 100 },
+        { id: "fr4", type: "openai-model", x: 160, y: 300 },
+        { id: "fr5", type: "qdrant-store", x: 420, y: 300 },
+        // embeddings esquecido, sem conexão
+        { id: "fr6", type: "openai-embeddings", x: 660, y: 420 },
+      ],
+      edges: [
+        { source: "fr1", target: "fr2", sourceHandle: "out-main", targetHandle: "in-main" },
+        { source: "fr2", target: "fr3", sourceHandle: "out-main", targetHandle: "in-main" },
+        { source: "fr4", target: "fr2", sourceHandle: "out-model", targetHandle: "in-model" },
+        { source: "fr5", target: "fr2", sourceHandle: "out-tool", targetHandle: "in-tool" },
+      ],
+    },
+    validate: (g) => {
+      const { checks, agent } = baseChatChecks(g);
+      const tools = agent ? providersOf(g, agent.id, "tool") : [];
+      const stores = tools.filter(
+        (t) => t.type === "qdrant-store" || t.type === "pinecone-store"
+      );
+      checks.push(
+        check(
+          "Vector Store conectado na porta Tool do AI Agent",
+          stores.length >= 1
+        ),
+        check(
+          "Vector Store possui Embeddings conectado",
+          stores.some((s) => providersOf(g, s.id, "embedding").length >= 1)
+        )
+      );
+      return { ok: checks.every((c) => c.pass), checks };
+    },
+  },
+  // ---------- Desafio final ----------
+  {
+    id: "boss-final",
+    title: "👑 BOSS: Atendente Completo da Robbu Store",
+    brief:
+      "O desafio final combina TUDO: um agente com memória persistente, base de conhecimento (RAG) e ferramenta de frete — no mesmo fluxo.",
+    userMessage:
+      "Oi! Sou a Marina de novo 😄 Quanto custa o Teclado Mecânico RGB TKL e quanto fica o frete pro CEP 01310-100?",
+    botReply:
+      "Bem-vinda de volta, Marina! 💛 O Teclado Mecânico RGB TKL custa R$ 349,90 (fonte: catalogo-2026.pdf) e o frete para 01310-100 fica em R$ 22,50 com entrega em 2 dias úteis 🚚. Fecho o pedido?",
+    xp: 500,
+    acceptance: [
+      "Estrutura básica do chatbot (trigger → agente → send)",
+      "Memória persistente (Redis Chat Memory) na porta Memory",
+      "Vector Store com Embeddings na porta Tool",
+      "Custom Tool (Code) também na porta Tool",
+    ],
+    hint:
+      "Um agente pode ter VÁRIAS ferramentas: conecte o Vector Store e o Custom Tool na mesma porta Tool. A memória Redis entra na porta Memory.",
+    validate: (g) => {
+      const { checks, agent } = baseChatChecks(g);
+      const memories = agent ? providersOf(g, agent.id, "memory") : [];
+      const tools = agent ? providersOf(g, agent.id, "tool") : [];
+      const stores = tools.filter(
+        (t) => t.type === "qdrant-store" || t.type === "pinecone-store"
+      );
+      checks.push(
+        check(
+          "Memória persistente (Redis Chat Memory) na porta Memory",
+          memories.some((m) => m.type === "redis-memory")
+        ),
+        check(
+          "Vector Store conectado na porta Tool",
+          stores.length >= 1
+        ),
+        check(
+          "Vector Store possui Embeddings conectado",
+          stores.some((s) => providersOf(g, s.id, "embedding").length >= 1)
+        ),
+        check(
+          "Custom Tool (Code) conectado na porta Tool",
+          tools.some((t) => t.type === "custom-tool")
+        )
+      );
+      return { ok: checks.every((c) => c.pass), checks };
+    },
+  }
+);
 
 export function getChallenge(id: string): Challenge | undefined {
   return CHALLENGES.find((c) => c.id === id);

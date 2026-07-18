@@ -29,9 +29,14 @@ const DEFAULT_USER_MESSAGE = "Olá! Preciso de ajuda com um pedido.";
 const DEFAULT_REPLY =
   "Olá! 👋 Sou o assistente virtual. Como posso ajudar com o seu pedido?";
 
-export function simulate(g: Graph, challenge?: Challenge | null): SimulationResult {
+export function simulate(
+  g: Graph,
+  challenge?: Challenge | null,
+  messageOverride?: string
+): SimulationResult {
   const steps: LogStep[] = [];
-  const userMessage = challenge?.userMessage ?? DEFAULT_USER_MESSAGE;
+  const userMessage =
+    messageOverride ?? challenge?.userMessage ?? DEFAULT_USER_MESSAGE;
   const fail = (tag: string, text: string): SimulationResult => {
     steps.push({ tag, text, tone: "error" });
     return { steps, userMessage, botReply: null, ok: false };
