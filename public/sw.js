@@ -1,7 +1,7 @@
-// Service worker do N8N Agentic Academy.
+// Service worker do RobbuGameN8N.
 // Estratégia network-first com fallback ao cache: online sempre serve a
 // versão fresca; offline devolve a última versão visitada.
-const CACHE = "n8n-academy-v1";
+const CACHE = "robbu-game-n8n-v2";
 
 self.addEventListener("install", () => self.skipWaiting());
 

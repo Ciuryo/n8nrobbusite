@@ -294,7 +294,7 @@ export function compileGraph(g: Graph): object {
   }
 
   return {
-    name: "Fluxo do Sandbox — N8N Agentic Academy",
+    name: "Fluxo do Sandbox — RobbuGameN8N",
     nodes: g.nodes.map((n, i) => ({
       name: nameOf.get(n.id),
       type: CATALOG_BY_TYPE[n.type]?.n8nType ?? n.type,

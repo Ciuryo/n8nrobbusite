@@ -51,7 +51,7 @@ export default function Home() {
             n8n · LangChain · WhatsApp Cloud API
           </p>
           <h1 className="mx-auto mt-3 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">
-            <span className="neon-text text-neon">N8N Agentic</span> Academy
+            <span className="neon-text text-neon">RobbuGame</span>N8N
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
             Plataforma gamificada de treinamento em{" "}

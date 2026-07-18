@@ -23,10 +23,10 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
           <span className="rounded bg-neon/10 px-2 py-1 font-mono text-sm font-bold text-neon neon-text">
-            ⬢ N8N
+            ⬢ Robbu
           </span>
           <span className="hidden font-semibold tracking-wide sm:inline">
-            Agentic Academy
+            GameN8N
           </span>
         </Link>
 

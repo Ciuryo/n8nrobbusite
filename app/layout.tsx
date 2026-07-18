@@ -17,13 +17,13 @@ const geistMono = Geist_Mono({
 const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 export const metadata: Metadata = {
-  title: "N8N Agentic Academy",
+  title: "RobbuGameN8N",
   description:
     "Plataforma gamificada de treinamento em IA, RAG e orquestração de agentes no n8n",
-  applicationName: "N8N Academy",
+  applicationName: "RobbuGameN8N",
   appleWebApp: {
     capable: true,
-    title: "N8N Academy",
+    title: "RobbuGameN8N",
     statusBarStyle: "black-translucent",
   },
   icons: {

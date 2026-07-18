@@ -1,4 +1,4 @@
-# N8N Agentic Academy
+# RobbuGameN8N
 
 Plataforma web gamificada de treinamento avançado em **Inteligência Artificial, RAG e orquestração de agentes no n8n** — ideias para iniciantes e times inteiros dominarem os Nós Advanced AI (LangChain) aplicados a chatbots de **WhatsApp**.
 
@@ -34,7 +34,7 @@ npm run build   # export estático em out/ (sirva com: npx serve out)
 O site é um **Progressive Web App** com deploy automático no GitHub Pages
 (workflow em `.github/workflows/deploy-pages.yml`):
 
-**https://ciuryo.github.io/n8nrobbusite/**
+**https://ciuryo.github.io/RobbuGameN8N/**
 
 Para instalar no celular (sem loja, sem custo):
 

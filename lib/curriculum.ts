@@ -1,4 +1,4 @@
-// Matriz curricular do N8N Agentic Academy.
+// Matriz curricular do RobbuGameN8N.
 // Cada SkillNode representa uma competência técnica desbloqueável na árvore de habilidades.
 
 export type SpecClass = "prompt-engineer" | "rag-engineer" | "agent-architect";

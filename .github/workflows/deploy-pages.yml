@@ -31,7 +31,7 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          NEXT_PUBLIC_BASE_PATH: /n8nrobbusite
+          NEXT_PUBLIC_BASE_PATH: /RobbuGameN8N
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

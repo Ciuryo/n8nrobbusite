@@ -6,8 +6,8 @@ const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "N8N Agentic Academy",
-    short_name: "N8N Academy",
+    name: "RobbuGameN8N",
+    short_name: "RobbuGameN8N",
     description:
       "Jogo de treinamento em IA, RAG e agentes no n8n — do primeiro nó ao agente autônomo no WhatsApp.",
     lang: "pt-BR",
