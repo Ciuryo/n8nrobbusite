@@ -38,12 +38,23 @@ import {
 import { simulate, type LogStep } from "@/lib/simulator";
 import { useAcademy } from "@/lib/store";
 import { fireConfetti } from "@/lib/confetti";
+import { getNode } from "@/lib/curriculum";
 
 const nodeTypes = { academy: FlowNode };
 
 const CATEGORIES = [...new Set(NODE_CATALOG.map((c) => c.category))];
 
 const CANVAS_KEY = "robbu-sandbox-canvas";
+
+/** nível do módulo recomendado (desafios sem referência vão para o fim) */
+function challengeLevel(c: Challenge): number {
+  return c.recommendedAfter ? (getNode(c.recommendedAfter)?.level ?? 99) : 99;
+}
+
+/** desafios em ordem didática: do Nível 0 ao boss */
+const ORDERED_CHALLENGES = [...CHALLENGES].sort(
+  (a, b) => challengeLevel(a) - challengeLevel(b)
+);
 
 function kindOf(handle: string | null | undefined): string | null {
   if (!handle) return null;
@@ -309,12 +320,15 @@ function SandboxInner() {
           className="rounded-md border border-edge bg-surface-2 px-2 py-1.5 text-xs outline-none focus:border-neon"
         >
           <option value="">Modo livre (sem desafio)</option>
-          {CHALLENGES.map((c) => (
-            <option key={c.id} value={c.id}>
-              {completedChallenges.includes(c.id) ? "✔ " : "◆ "}
-              {c.title} (+{c.xp} XP)
-            </option>
-          ))}
+          {ORDERED_CHALLENGES.map((c) => {
+            const rec = c.recommendedAfter ? getNode(c.recommendedAfter) : null;
+            return (
+              <option key={c.id} value={c.id}>
+                {completedChallenges.includes(c.id) ? "✔ " : "◆ "}
+                {c.title} (+{c.xp} XP{rec ? ` · Nv${rec.level}` : ""})
+              </option>
+            );
+          })}
         </select>
 
         <div className="ml-auto flex items-center gap-2">
@@ -364,6 +378,14 @@ function SandboxInner() {
         <div className="border-b border-edge bg-surface-2/50 px-4 py-2 text-xs">
           <span className="font-semibold text-neon-2">◆ {challenge.title}</span>
           {challengeDone && <span className="ml-2 text-success">✔ concluído</span>}
+          {!challengeDone && challenge.recommendedAfter && (() => {
+            const rec = getNode(challenge.recommendedAfter);
+            return rec ? (
+              <span className="ml-2 font-mono text-gold/80">
+                🎓 recomendado após o módulo {rec.module}
+              </span>
+            ) : null;
+          })()}
           <span className="ml-2 text-muted">{challenge.brief}</span>
           <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px]">
             {(liveChecks?.checks ?? []).map((c, i) => (

@@ -37,6 +37,8 @@ export interface Challenge {
   hint?: string;
   /** fluxo defeituoso pré-carregado — o jogador precisa consertar */
   setup?: ChallengeSetup;
+  /** id do nó da árvore cujo estudo é recomendado antes deste desafio */
+  recommendedAfter?: string;
   validate: (g: Graph) => ValidationResult;
 }
 
@@ -74,6 +76,7 @@ function baseChatChecks(g: Graph) {
 export const CHALLENGES: Challenge[] = [
   {
     id: "eco-bot",
+    recommendedAfter: "first-workflow",
     title: "Fluxo de Eco (seu primeiro fluxo!)",
     brief:
       "O menor fluxo útil que existe: receba a mensagem do cliente e devolva-a como eco. Sem IA — o objetivo é dominar o fluxo principal.",
@@ -103,6 +106,7 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: "agente-whatsapp",
+    recommendedAfter: "ai-agent",
     title: "Primeiro Agente no WhatsApp",
     brief:
       "Monte o esqueleto mínimo de um chatbot agêntico: WhatsApp Trigger → AI Agent (com Chat Model) → WhatsApp Send.",
@@ -124,6 +128,7 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: "memoria-persistente",
+    recommendedAfter: "session-persistence",
     title: "Sessão Persistente por Telefone",
     brief:
       "O bot precisa lembrar o contexto entre mensagens e sobreviver a reinícios do n8n: adicione Redis Chat Memory ao agente, com o telefone como Session ID.",
@@ -155,6 +160,7 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: "rag-pipeline",
+    recommendedAfter: "retrieval",
     title: "RAG de Catálogo de Produtos",
     brief:
       "O cliente pergunta o preço de um produto que está na base de conhecimento. Conecte um Vector Store (com Embeddings) como ferramenta do agente.",
@@ -192,6 +198,7 @@ export const CHALLENGES: Challenge[] = [
   },
   {
     id: "custom-tool-frete",
+    recommendedAfter: "custom-tools",
     title: "Custom Tool: Cálculo de Frete",
     brief:
       "Transforme a API legada de frete em uma ferramenta que o agente invoca sozinho: adicione um Custom Tool (Code) calc_frete(cep, sku).",
@@ -224,6 +231,7 @@ export const CHALLENGES: Challenge[] = [
 CHALLENGES.push(
   {
     id: "conserto-cerebro",
+    recommendedAfter: "llm-nodes",
     title: "🔧 Conserto: Agente Sem Cérebro",
     brief:
       "O bot caiu em produção! O fluxo parece completo, mas algo está desconectado. Execute, leia o erro no terminal e conserte.",
@@ -257,6 +265,7 @@ CHALLENGES.push(
   },
   {
     id: "conserto-rag",
+    recommendedAfter: "retrieval",
     title: "🔧 Conserto: RAG Sem Embeddings",
     brief:
       "O bot responde, mas inventa preços! O Vector Store está no lugar — falta a peça que vetoriza as consultas. Encontre e conecte.",
@@ -310,6 +319,7 @@ CHALLENGES.push(
   // ---------- Desafio final ----------
   {
     id: "boss-final",
+    recommendedAfter: "ai-agent",
     title: "👑 BOSS: Atendente Completo da Robbu Store",
     brief:
       "O desafio final combina TUDO: um agente com memória persistente, base de conhecimento (RAG) e ferramenta de frete — no mesmo fluxo.",

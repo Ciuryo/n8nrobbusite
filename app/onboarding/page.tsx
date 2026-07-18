@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CLASSES, getNode, type SpecClass } from "@/lib/curriculum";
+import {
+  CLASSES,
+  getNode,
+  shuffledIndices,
+  type SpecClass,
+} from "@/lib/curriculum";
 import { useAcademy } from "@/lib/store";
 
 // Nivelamento: acertando as 3, os módulos do Nível 1 são creditados automaticamente.
@@ -45,6 +50,12 @@ export default function OnboardingPage() {
   const [specClass, setSpecClass] = useState<SpecClass | null>(null);
   const [answers, setAnswers] = useState<number[]>([-1, -1, -1]);
   const [placementResult, setPlacementResult] = useState<string | null>(null);
+  // Ordem embaralhada das opções, gerada no cliente (hidratação segura)
+  const [perms, setPerms] = useState<number[][]>([]);
+
+  useEffect(() => {
+    setPerms(PLACEMENT.map((q) => shuffledIndices(q.options.length)));
+  }, []);
 
   function finish(skipBasics: boolean, destination = "/skills") {
     if (!specClass) return;
@@ -197,7 +208,9 @@ export default function OnboardingPage() {
                   {qi + 1}. {q.question}
                 </legend>
                 <div className="grid gap-1.5">
-                  {q.options.map((opt, oi) => (
+                  {(perms[qi] ?? q.options.map((_, i) => i)).map((oi) => {
+                    const opt = q.options[oi];
+                    return (
                     <label
                       key={oi}
                       className={`cursor-pointer rounded-md border px-3 py-2 font-mono text-xs transition ${
@@ -219,7 +232,8 @@ export default function OnboardingPage() {
                       />
                       {opt}
                     </label>
-                  ))}
+                    );
+                  })}
                 </div>
               </fieldset>
             ))}

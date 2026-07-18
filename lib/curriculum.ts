@@ -842,7 +842,7 @@ export const SKILL_TREE: SkillNode[] = [
   },
   {
     id: "custom-tools",
-    module: "5.2",
+    module: "5.1",
     level: 5,
     title: "Custom Tools (Ferramentas Personalizadas)",
     icon: "🛠️",
@@ -914,7 +914,7 @@ export const SKILL_TREE: SkillNode[] = [
   },
   {
     id: "ai-agent",
-    module: "5.1",
+    module: "5.2",
     level: 5,
     title: "O Nó AI Agent (ReAct & Autonomia)",
     icon: "🤖",
@@ -1128,6 +1128,17 @@ export const TOTAL_XP = SKILL_TREE.reduce((acc, n) => acc + n.xp, 0);
 
 export function getNode(id: string): SkillNode | undefined {
   return SKILL_TREE.find((n) => n.id === id);
+}
+
+/** Fisher–Yates: índices 0..n-1 em ordem aleatória (embaralha opções de quiz).
+ *  Chamar apenas no cliente (useEffect) para não quebrar a hidratação. */
+export function shuffledIndices(n: number): number[] {
+  const idx = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [idx[i], idx[j]] = [idx[j], idx[i]];
+  }
+  return idx;
 }
 
 export type NodeState = "locked" | "available" | "completed";

@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getNode, nodeState, LEVEL_NAMES, SKILL_TREE } from "@/lib/curriculum";
+import {
+  getNode,
+  nodeState,
+  shuffledIndices,
+  LEVEL_NAMES,
+  SKILL_TREE,
+} from "@/lib/curriculum";
 import { CHALLENGES } from "@/lib/challenges";
 import { useAcademy, xpWithBonus } from "@/lib/store";
 
@@ -56,9 +62,15 @@ export default function ModuleClient() {
 
   const [answers, setAnswers] = useState<number[]>([]);
   const [graded, setGraded] = useState<boolean[] | null>(null);
+  // Ordem de exibição embaralhada por questão (índices originais).
+  // Gerada no cliente para não quebrar a hidratação da página estática.
+  const [perms, setPerms] = useState<number[][]>([]);
 
   useEffect(() => {
-    if (node) setAnswers(new Array(node.quiz.length).fill(-1));
+    if (node) {
+      setAnswers(new Array(node.quiz.length).fill(-1));
+      setPerms(node.quiz.map((q) => shuffledIndices(q.options.length)));
+    }
   }, [node]);
 
   const quizPassed = node ? passedQuizzes.includes(node.id) : false;
@@ -218,7 +230,8 @@ export default function ModuleClient() {
                   {qi + 1}. {q.question}
                 </legend>
                 <div className="grid gap-1.5">
-                  {q.options.map((opt, oi) => {
+                  {(perms[qi] ?? q.options.map((_, i) => i)).map((oi) => {
+                    const opt = q.options[oi];
                     const chosen = answers[qi] === oi;
                     const wrong =
                       graded && chosen && !graded[qi] ? "border-danger text-danger" : "";
