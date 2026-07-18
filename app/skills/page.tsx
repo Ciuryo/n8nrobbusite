@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import {
   SKILL_TREE,
   LEVEL_NAMES,
+  LEVEL_COLORS,
   nodeState,
   type NodeState,
 } from "@/lib/curriculum";
@@ -28,9 +29,9 @@ function center(pos: { col: number; row: number }) {
 const STATE_STYLE: Record<NodeState, string> = {
   locked: "border-edge bg-surface opacity-50 cursor-not-allowed",
   available:
-    "node-available border-neon bg-surface-2 cursor-pointer hover:brightness-125",
+    "node-available border-neon bg-surface-2 cursor-pointer transition hover:scale-[1.03] hover:brightness-125",
   completed:
-    "border-gold bg-gold/10 cursor-pointer hover:brightness-125 shadow-[0_0_14px_rgba(251,191,36,0.25)]",
+    "border-gold bg-gradient-to-br from-gold/20 to-gold/5 cursor-pointer transition hover:scale-[1.03] hover:brightness-125 shadow-[0_0_14px_rgba(251,191,36,0.25)]",
 };
 
 export default function SkillsPage() {
@@ -67,7 +68,9 @@ export default function SkillsPage() {
           Mapa de progressão
         </p>
         <div className="mb-2 flex flex-wrap items-end justify-between gap-3">
-          <h1 className="text-2xl font-bold">Árvore de Habilidades</h1>
+          <h1 className="font-display text-2xl font-bold">
+            Árvore de Habilidades
+          </h1>
           <div className="flex gap-4 font-mono text-[11px] text-muted">
             <span>
               <span className="mr-1 inline-block h-2.5 w-2.5 rounded-sm border border-edge bg-surface align-middle" />
@@ -141,7 +144,10 @@ export default function SkillsPage() {
                 )}
                 <div className="flex items-start justify-between">
                   <span className="font-mono text-lg">{node.icon}</span>
-                  <span className="font-mono text-[10px] text-muted">
+                  <span
+                    className="font-mono text-[10px]"
+                    style={{ color: LEVEL_COLORS[node.level] }}
+                  >
                     Nv{node.level} · {node.module}
                   </span>
                 </div>
@@ -200,7 +206,8 @@ export default function SkillsPage() {
         <div className="mx-auto flex max-w-7xl flex-wrap gap-x-8 gap-y-1 font-mono text-[11px] text-muted">
           {Object.entries(LEVEL_NAMES).map(([lvl, name]) => (
             <span key={lvl}>
-              <span className="text-neon">Nv{lvl}</span> {name}
+              <span style={{ color: LEVEL_COLORS[Number(lvl)] }}>Nv{lvl}</span>{" "}
+              {name}
             </span>
           ))}
         </div>

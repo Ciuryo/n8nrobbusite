@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface ChatMessage {
   from: "cliente" | "bot";
@@ -10,11 +10,24 @@ export interface ChatMessage {
 export default function WhatsAppWidget({
   messages,
   typing,
+  onSend,
+  disabled,
 }: {
   messages: ChatMessage[];
   typing: boolean;
+  /** envia uma mensagem digitada pelo jogador (executa o fluxo com ela) */
+  onSend?: (text: string) => void;
+  disabled?: boolean;
 }) {
+  const [draft, setDraft] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  function send() {
+    const text = draft.trim();
+    if (!text || !onSend || disabled) return;
+    setDraft("");
+    onSend(text);
+  }
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
@@ -83,6 +96,28 @@ export default function WhatsAppWidget({
         )}
         <div ref={bottomRef} />
       </div>
+
+      {/* Campo de digitação — o jogador vira o cliente */}
+      {onSend && (
+        <div className="flex items-center gap-2 border-t border-black/40 bg-[#202c33] px-2 py-2">
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && send()}
+            disabled={disabled}
+            placeholder="Digite como cliente…"
+            className="min-w-0 flex-1 rounded-full bg-[#2a3942] px-3 py-1.5 text-[13px] text-[#e9edef] outline-none placeholder:text-[#8696a0] disabled:opacity-50"
+          />
+          <button
+            onClick={send}
+            disabled={disabled || !draft.trim()}
+            aria-label="Enviar mensagem"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#00a884] text-[#0b141a] transition hover:brightness-110 disabled:opacity-40"
+          >
+            ➤
+          </button>
+        </div>
+      )}
     </div>
   );
 }

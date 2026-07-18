@@ -127,7 +127,7 @@ export default function TeamPage() {
       <p className="font-mono text-xs uppercase tracking-[0.3em] text-neon">
         Visão macro da equipe
       </p>
-      <h1 className="mb-6 text-2xl font-bold">Painel do Gestor</h1>
+      <h1 className="font-display mb-6 text-2xl font-bold">Painel do Gestor</h1>
 
       {/* Métricas de desempenho */}
       <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">

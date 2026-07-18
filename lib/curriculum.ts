@@ -1,4 +1,4 @@
-// Matriz curricular do N8N Agentic Academy.
+// Matriz curricular do RobbuGameN8N.
 // Cada SkillNode representa uma competência técnica desbloqueável na árvore de habilidades.
 
 export type SpecClass = "prompt-engineer" | "rag-engineer" | "agent-architect";
@@ -63,6 +63,17 @@ export interface SkillNode {
   /** Posição no mapa de habilidades (coluna, linha) */
   pos: { col: number; row: number };
 }
+
+/** Rampa de cor por nível: do ciano (fundamentos) ao magenta (produção) */
+export const LEVEL_COLORS: Record<number, string> = {
+  0: "#22d3ee",
+  1: "#38bdf8",
+  2: "#60a5fa",
+  3: "#818cf8",
+  4: "#a78bfa",
+  5: "#c084fc",
+  6: "#e879f9",
+};
 
 export const LEVEL_NAMES: Record<number, string> = {
   0: "Introdução — Bem-vindo ao n8n",
@@ -351,6 +362,7 @@ export const SKILL_TREE: SkillNode[] = [
     ],
     deps: ["json-mastery"],
     xp: 120,
+    challengeId: "payload-domado",
     pos: { col: 3, row: 0 },
   },
   {
@@ -487,6 +499,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["llm-nodes"],
     xp: 150,
     bonusClass: "prompt-engineer",
+    challengeId: "primeira-chain",
     pos: { col: 5, row: 0 },
   },
   {
@@ -831,7 +844,7 @@ export const SKILL_TREE: SkillNode[] = [
   },
   {
     id: "custom-tools",
-    module: "5.2",
+    module: "5.1",
     level: 5,
     title: "Custom Tools (Ferramentas Personalizadas)",
     icon: "🛠️",
@@ -903,7 +916,7 @@ export const SKILL_TREE: SkillNode[] = [
   },
   {
     id: "ai-agent",
-    module: "5.1",
+    module: "5.2",
     level: 5,
     title: "O Nó AI Agent (ReAct & Autonomia)",
     icon: "🤖",
@@ -1109,6 +1122,7 @@ export const SKILL_TREE: SkillNode[] = [
     deps: ["ai-agent", "retrieval"],
     xp: 220,
     bonusClass: "prompt-engineer",
+    challengeId: "guardrail-blindado",
     pos: { col: 9, row: -1 },
   },
 ];
@@ -1117,6 +1131,17 @@ export const TOTAL_XP = SKILL_TREE.reduce((acc, n) => acc + n.xp, 0);
 
 export function getNode(id: string): SkillNode | undefined {
   return SKILL_TREE.find((n) => n.id === id);
+}
+
+/** Fisher–Yates: índices 0..n-1 em ordem aleatória (embaralha opções de quiz).
+ *  Chamar apenas no cliente (useEffect) para não quebrar a hidratação. */
+export function shuffledIndices(n: number): number[] {
+  const idx = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [idx[i], idx[j]] = [idx[j], idx[i]];
+  }
+  return idx;
 }
 
 export type NodeState = "locked" | "available" | "completed";
