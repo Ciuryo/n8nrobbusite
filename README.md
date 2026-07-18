@@ -26,8 +26,23 @@ Implementação do blueprint técnico do projeto: LMS gamificado (árvore de hab
 ```bash
 npm install
 npm run dev     # http://localhost:3000
-npm run build   # build de produção
+npm run build   # export estático em out/ (sirva com: npx serve out)
 ```
+
+## App de celular (PWA) — grátis
+
+O site é um **Progressive Web App** com deploy automático no GitHub Pages
+(workflow em `.github/workflows/deploy-pages.yml`):
+
+**https://ciuryo.github.io/n8nrobbusite/**
+
+Para instalar no celular (sem loja, sem custo):
+
+- **Android (Chrome)**: abra o link → menu ⋮ → **"Adicionar à tela inicial"** / **"Instalar app"**.
+- **iPhone (Safari)**: abra o link → botão Compartilhar → **"Adicionar à Tela de Início"**.
+
+O app abre em tela cheia com ícone próprio, funciona offline após a primeira
+visita (service worker) e o progresso fica salvo no aparelho (`localStorage`).
 
 ## Estrutura
 

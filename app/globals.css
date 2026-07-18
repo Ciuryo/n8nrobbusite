@@ -39,6 +39,11 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
+/* Área segura para PWA em tela cheia (notch/status bar do iOS) */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
 .grid-bg {
   background-image:
     linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),

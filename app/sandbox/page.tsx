@@ -187,7 +187,7 @@ function SandboxInner() {
     : false;
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden">
+    <div className="flex flex-1 flex-col lg:overflow-hidden">
       {/* Barra de controle */}
       <div className="flex flex-wrap items-center gap-2 border-b border-edge bg-surface px-4 py-2">
         <label className="font-mono text-[10px] uppercase tracking-widest text-muted">
@@ -258,35 +258,37 @@ function SandboxInner() {
         </div>
       )}
 
-      <div className="flex min-h-0 flex-1">
-        {/* Paleta de nós */}
-        <aside className="w-52 shrink-0 overflow-y-auto border-r border-edge bg-surface">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        {/* Paleta de nós — faixa horizontal no celular, coluna no desktop */}
+        <aside className="w-full shrink-0 overflow-x-auto border-b border-edge bg-surface lg:w-52 lg:overflow-y-auto lg:overflow-x-hidden lg:border-b-0 lg:border-r">
           <p className="px-3 pb-1 pt-3 font-mono text-[10px] uppercase tracking-widest text-muted">
             Paleta de Nós (+)
           </p>
-          {CATEGORIES.map((cat) => (
-            <div key={cat} className="px-2 pb-2">
-              <p className="px-1 py-1 text-[10px] font-semibold uppercase text-neon/70">
-                {cat}
-              </p>
-              {NODE_CATALOG.filter((c) => c.category === cat).map((c) => (
-                <button
-                  key={c.type}
-                  onClick={() => addNode(c.type)}
-                  title={c.desc}
-                  className="mb-1 flex w-full items-center gap-2 rounded-md border border-edge bg-surface-2 px-2 py-1.5 text-left text-xs transition hover:border-neon/60"
-                >
-                  <span>{c.icon}</span>
-                  <span className="leading-tight">{c.label}</span>
-                  <span className="ml-auto text-muted">+</span>
-                </button>
-              ))}
-            </div>
-          ))}
+          <div className="flex lg:block">
+            {CATEGORIES.map((cat) => (
+              <div key={cat} className="min-w-44 shrink-0 px-2 pb-2 lg:min-w-0">
+                <p className="px-1 py-1 text-[10px] font-semibold uppercase text-neon/70">
+                  {cat}
+                </p>
+                {NODE_CATALOG.filter((c) => c.category === cat).map((c) => (
+                  <button
+                    key={c.type}
+                    onClick={() => addNode(c.type)}
+                    title={c.desc}
+                    className="mb-1 flex w-full items-center gap-2 rounded-md border border-edge bg-surface-2 px-2 py-1.5 text-left text-xs transition hover:border-neon/60"
+                  >
+                    <span>{c.icon}</span>
+                    <span className="leading-tight">{c.label}</span>
+                    <span className="ml-auto text-muted">+</span>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
         </aside>
 
         {/* Canvas */}
-        <div className="relative min-w-0 flex-1">
+        <div className="relative min-h-[55vh] min-w-0 flex-1 lg:min-h-0">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -336,7 +338,7 @@ function SandboxInner() {
 
           {/* Resultado da validação */}
           {validation && (
-            <div className="absolute bottom-4 left-4 z-10 w-80 rounded-lg border border-edge bg-surface/95 p-3 shadow-xl backdrop-blur">
+            <div className="absolute bottom-4 left-4 z-10 w-80 max-w-[calc(100%-2rem)] rounded-lg border border-edge bg-surface/95 p-3 shadow-xl backdrop-blur">
               <p
                 className={`mb-2 text-sm font-bold ${
                   validation.ok ? "text-success" : "text-danger"
@@ -369,7 +371,7 @@ function SandboxInner() {
 
           {/* Compilador de grafo → JSON */}
           {showJson && (
-            <div className="absolute right-4 top-4 z-10 max-h-[70%] w-96 overflow-auto rounded-lg border border-edge bg-black/90 p-3 shadow-xl">
+            <div className="absolute right-4 top-4 z-10 max-h-[70%] w-96 max-w-[calc(100%-2rem)] overflow-auto rounded-lg border border-edge bg-black/90 p-3 shadow-xl">
               <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-neon">
                 Payload compilado (formato n8n)
               </p>
@@ -380,12 +382,12 @@ function SandboxInner() {
           )}
         </div>
 
-        {/* Simulador lateral */}
-        <aside className="flex w-80 shrink-0 flex-col gap-2 border-l border-edge bg-surface p-2 xl:w-96">
-          <div className="min-h-0 flex-[3]">
+        {/* Simulador — embaixo no celular, lateral no desktop */}
+        <aside className="flex w-full shrink-0 flex-col gap-2 border-t border-edge bg-surface p-2 lg:w-80 lg:border-l lg:border-t-0 xl:w-96">
+          <div className="min-h-0 flex-[3] max-lg:h-80 max-lg:flex-none">
             <WhatsAppWidget messages={chat} typing={typing} />
           </div>
-          <div className="min-h-0 flex-[2]">
+          <div className="min-h-0 flex-[2] max-lg:h-56 max-lg:flex-none">
             <ExecutionTerminal steps={logSteps} running={running} />
           </div>
         </aside>

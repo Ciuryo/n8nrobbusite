@@ -19,7 +19,7 @@ export default function Navbar() {
   const pct = Math.min(100, Math.round((xp / TOTAL_XP) * 100));
 
   return (
-    <header className="sticky top-0 z-40 border-b border-edge bg-background/85 backdrop-blur">
+    <header className="safe-top sticky top-0 z-40 border-b border-edge bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3">
         <Link href="/" className="flex items-center gap-2">
           <span className="rounded bg-neon/10 px-2 py-1 font-mono text-sm font-bold text-neon neon-text">
@@ -45,6 +45,12 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
+
+        {hydrated && onboarded && (
+          <span className="shrink-0 font-mono text-[11px] font-bold text-gold md:hidden">
+            {xp} XP
+          </span>
+        )}
 
         {hydrated && onboarded && (
           <div className="hidden items-center gap-3 md:flex">
