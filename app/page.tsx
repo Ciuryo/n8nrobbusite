@@ -54,11 +54,15 @@ export default function Home() {
             <span className="neon-text text-neon">N8N Agentic</span> Academy
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
-            Plataforma gamificada de treinamento avançado em{" "}
+            Plataforma gamificada de treinamento em{" "}
             <span className="text-foreground">Inteligência Artificial</span>,{" "}
             <span className="text-foreground">RAG</span> e{" "}
             <span className="text-foreground">orquestração de agentes</span> no
-            n8n — do webhook cru ao agente autônomo respondendo no WhatsApp.
+            n8n — do primeiro nó ao agente autônomo respondendo no WhatsApp.
+          </p>
+          <p className="mx-auto mt-3 max-w-xl text-sm text-success">
+            🌱 Nenhuma experiência prévia é necessária: o Nível 0 explica o que
+            é o n8n antes de qualquer linha de código.
           </p>
 
           {hydrated && !onboarded && (
@@ -116,6 +120,50 @@ export default function Home() {
           )}
         </div>
 
+        {/* Como funciona (guia rápido para quem chega agora) */}
+        <div className="mt-16">
+          <h2 className="text-center text-xl font-bold">Como Funciona</h2>
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                step: "01",
+                icon: "🎭",
+                title: "Crie seu personagem",
+                desc: "Escolha um codinome e uma classe de especialização — ela dá +20% de XP na sua trilha favorita.",
+              },
+              {
+                step: "02",
+                icon: "📚",
+                title: "Estude e valide",
+                desc: "Cada competência tem uma lição direta ao ponto e um quiz. Passou? XP na conta e novos nós desbloqueados.",
+              },
+              {
+                step: "03",
+                icon: "🧪",
+                title: "Pratique no Sandbox",
+                desc: "Monte o fluxo de verdade no canvas estilo n8n e veja o bot responder no simulador de WhatsApp.",
+              },
+              {
+                step: "04",
+                icon: "🏆",
+                title: "Suba de patente",
+                desc: "De Recruta do n8n a Arquiteto Agêntico: acumule XP, complete desafios e dispute o leaderboard.",
+              },
+            ].map((s) => (
+              <div key={s.step} className="panel p-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl">{s.icon}</span>
+                  <span className="font-mono text-xs text-neon">{s.step}</span>
+                </div>
+                <h3 className="mt-3 text-sm font-semibold">{s.title}</h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted">
+                  {s.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Pilares */}
         <div className="mt-16 grid gap-4 md:grid-cols-3">
           {FEATURES.map((f) => (
@@ -136,7 +184,7 @@ export default function Home() {
         {/* Currículo */}
         <div className="mt-16">
           <h2 className="text-center text-xl font-bold">
-            Matriz Curricular — 6 Níveis
+            Matriz Curricular — do Nível 0 ao 6
           </h2>
           <p className="mt-1 text-center text-sm text-muted">
             {SKILL_TREE.length} competências · {CHALLENGES.length} desafios

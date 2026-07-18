@@ -46,14 +46,16 @@ export default function OnboardingPage() {
   const [answers, setAnswers] = useState<number[]>([-1, -1, -1]);
   const [placementResult, setPlacementResult] = useState<string | null>(null);
 
-  function finish(skipLevel1: boolean) {
+  function finish(skipBasics: boolean, destination = "/skills") {
     if (!specClass) return;
     setProfile(name.trim() || "Recruta", specClass);
-    if (skipLevel1) {
-      completeNode("json-mastery");
-      completeNode("webhooks-whatsapp");
+    if (skipBasics) {
+      // Nivelamento aprovado: credita a introdução (Nível 0) e os módulos do Nível 1
+      ["n8n-basics", "first-workflow", "json-mastery", "webhooks-whatsapp"].forEach(
+        completeNode
+      );
     }
-    router.push("/skills");
+    router.push(destination);
   }
 
   function gradePlacement() {
@@ -63,11 +65,11 @@ export default function OnboardingPage() {
         .map((id) => getNode(id)?.title)
         .join(" e ");
       setPlacementResult(
-        `✔ ${correct}/3 — Nivelamento aprovado! Os módulos "${l1}" serão creditados com XP integral.`
+        `✔ ${correct}/3 — Nivelamento aprovado! A introdução (Nível 0) e os módulos "${l1}" serão creditados com XP integral.`
       );
     } else {
       setPlacementResult(
-        `${correct}/3 — Sem problemas: você começará pelos fundamentos do Nível 1.`
+        `${correct}/3 — Sem problemas: você começará pela introdução, do jeito certo.`
       );
     }
   }
@@ -160,13 +162,33 @@ export default function OnboardingPage() {
 
         {step === 2 && (
           <div className="panel p-6">
+            <div className="mb-5 rounded-lg border border-success/40 bg-success/5 p-4">
+              <h2 className="text-base font-semibold text-success">
+                🌱 Nunca usou o n8n?
+              </h2>
+              <p className="mt-1 text-sm text-muted">
+                Perfeito — a trilha começa do absoluto zero. O Nível 0 explica o
+                que é o n8n, o que são nós e gatilhos, e você monta seu primeiro
+                fluxo no Sandbox em poucos minutos.
+              </p>
+              <button
+                onClick={() => finish(false, "/module/n8n-basics")}
+                className="mt-3 w-full rounded-md bg-success px-4 py-3 font-semibold text-background transition hover:brightness-110"
+              >
+                Começar pela introdução (Nível 0) →
+              </button>
+            </div>
+
             <h2 className="mb-1 text-lg font-semibold">
               Nivelamento Inicial{" "}
-              <span className="font-mono text-xs text-muted">(opcional)</span>
+              <span className="font-mono text-xs text-muted">
+                (opcional, para quem já usa n8n)
+              </span>
             </h2>
             <p className="mb-4 text-sm text-muted">
-              Acerte as 3 questões práticas para pular os módulos básicos de
-              lógica e webhooks do Nível 1 — com XP creditado.
+              Já domina webhooks e o nó Code? Acerte as 3 questões práticas para
+              pular a introdução e os módulos básicos do Nível 1 — com XP
+              creditado.
             </p>
 
             {PLACEMENT.map((q, qi) => (
@@ -219,7 +241,7 @@ export default function OnboardingPage() {
                 onClick={() => finish(false)}
                 className="rounded-md border border-edge px-4 py-3 text-sm text-muted hover:text-foreground"
               >
-                Pular nivelamento e começar do zero
+                Pular e ir para a árvore
               </button>
               {!placementResult ? (
                 <button

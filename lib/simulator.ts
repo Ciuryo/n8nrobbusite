@@ -61,9 +61,33 @@ export function simulate(g: Graph, challenge?: Challenge | null): SimulationResu
   const brain = agent ?? chain;
 
   if (!brain) {
+    // Fluxo de eco (Nível 0): Trigger → Send direto, sem IA
+    if (mainPathReaches(g, trigger.id, "whatsapp-send")) {
+      steps.push({
+        tag: "Flow",
+        text: "Nenhum nó de IA no fluxo — modo eco: o item { json: { from, text } } segue direto pelo fluxo principal.",
+        tone: "info",
+      });
+      steps.push({
+        tag: "Flow",
+        text: "Texto recebido repassado ao nó de saída sem transformação",
+        tone: "action",
+      });
+      steps.push({
+        tag: "WhatsApp",
+        text: 'POST /v19.0/{phone-number-id}/messages → 200 { "messages": [{ "id": "wamid.HBg..." }] }',
+        tone: "success",
+      });
+      return {
+        steps,
+        userMessage,
+        botReply: `Eco 🤖: "${userMessage}"`,
+        ok: true,
+      };
+    }
     return fail(
       "Runtime",
-      "O payload chegou, mas nenhum nó de IA (AI Agent ou Basic LLM Chain) está no fluxo."
+      "O payload chegou, mas não há caminho até uma saída. Conecte o Trigger a um nó de IA (AI Agent / Basic LLM Chain) — ou, para um eco simples, direto ao WhatsApp Send."
     );
   }
 

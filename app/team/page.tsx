@@ -9,7 +9,7 @@ const SERIES_TEAM = "#06a6c4";
 const SERIES_YOU = "#c936da";
 
 const AXES = [
-  { key: "whatsapp", label: "WhatsApp & Mensageria", nodes: ["json-mastery", "webhooks-whatsapp", "session-persistence"] },
+  { key: "whatsapp", label: "Fundamentos & Mensageria", nodes: ["n8n-basics", "first-workflow", "json-mastery", "webhooks-whatsapp", "session-persistence"] },
   { key: "prompts", label: "Prompts & LLMs", nodes: ["llm-nodes", "prompt-engineering"] },
   { key: "rag", label: "RAG", nodes: ["document-loaders", "vector-stores", "retrieval"] },
   { key: "agents", label: "Agentes & Tools", nodes: ["memory-types", "custom-tools", "ai-agent"] },

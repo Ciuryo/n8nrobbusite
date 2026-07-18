@@ -22,6 +22,8 @@ export interface Challenge {
   botReply: string;
   xp: number;
   acceptance: string[];
+  /** dica exibida no Sandbox para orientar quem está travado */
+  hint?: string;
   validate: (g: Graph) => ValidationResult;
 }
 
@@ -58,6 +60,35 @@ function baseChatChecks(g: Graph) {
 
 export const CHALLENGES: Challenge[] = [
   {
+    id: "eco-bot",
+    title: "Fluxo de Eco (seu primeiro fluxo!)",
+    brief:
+      "O menor fluxo útil que existe: receba a mensagem do cliente e devolva-a como eco. Sem IA — o objetivo é dominar o fluxo principal.",
+    userMessage: "Olá! Tem alguém aí? 👀",
+    botReply: 'Eco 🤖: "Olá! Tem alguém aí? 👀"',
+    xp: 150,
+    acceptance: [
+      "1 WhatsApp Trigger recebendo o webhook",
+      "Conexão do fluxo principal (main) do Trigger até o WhatsApp Send",
+      "Nenhum nó de IA necessário",
+    ],
+    hint:
+      "Clique em WhatsApp Trigger e WhatsApp Send na paleta e arraste uma conexão da porta direita (→) do Trigger até a porta esquerda do Send.",
+    validate: (g) => {
+      const triggers = nodesOfType(g, "whatsapp-trigger");
+      const senders = nodesOfType(g, "whatsapp-send");
+      const checks = [
+        check("Possui exatamente 1 WhatsApp Trigger", triggers.length === 1),
+        check("Possui um nó WhatsApp Send", senders.length >= 1),
+        check(
+          "Fluxo principal conectado do Trigger até o WhatsApp Send",
+          !!triggers[0] && mainPathReaches(g, triggers[0].id, "whatsapp-send")
+        ),
+      ];
+      return { ok: checks.every((c) => c.pass), checks };
+    },
+  },
+  {
     id: "agente-whatsapp",
     title: "Primeiro Agente no WhatsApp",
     brief:
@@ -71,6 +102,8 @@ export const CHALLENGES: Challenge[] = [
       "AI Agent com um Chat Model (OpenAI ou Ollama) na porta Model",
       "Resposta roteada para o nó WhatsApp Send",
     ],
+    hint:
+      "O AI Agent entra ENTRE o Trigger e o Send no fluxo principal. O Chat Model é um sub-nó: conecte a porta de cima dele à porta Model (embaixo) do agente.",
     validate: (g) => {
       const { checks } = baseChatChecks(g);
       return { ok: checks.every((c) => c.pass), checks };
@@ -89,6 +122,8 @@ export const CHALLENGES: Challenge[] = [
       "Estrutura básica do chatbot (trigger → agente → send)",
       "Memória PERSISTENTE (Redis Chat Memory) conectada na porta Memory",
     ],
+    hint:
+      "Existem duas memórias na paleta — só uma sobrevive a reinícios do n8n. Conecte-a à porta Memory (embaixo) do AI Agent.",
     validate: (g) => {
       const { checks, agent } = baseChatChecks(g);
       const memories = agent ? providersOf(g, agent.id, "memory") : [];
@@ -119,6 +154,8 @@ export const CHALLENGES: Challenge[] = [
       "Vector Store (Qdrant ou Pinecone) conectado na porta Tool do agente",
       "Nó de Embeddings conectado ao Vector Store",
     ],
+    hint:
+      "São duas conexões de sub-nó: o Vector Store entra na porta Tool do agente, e o OpenAI Embeddings entra na porta Embedding do Vector Store.",
     validate: (g) => {
       const { checks, agent } = baseChatChecks(g);
       const tools = agent ? providersOf(g, agent.id, "tool") : [];
@@ -153,6 +190,8 @@ export const CHALLENGES: Challenge[] = [
       "Estrutura básica do chatbot (trigger → agente → send)",
       "Custom Tool (Code) conectado na porta Tool do agente",
     ],
+    hint:
+      "Adicione o Custom Tool (Code) da categoria Ferramentas e conecte a porta de cima dele à porta Tool (embaixo) do AI Agent.",
     validate: (g) => {
       const { checks, agent } = baseChatChecks(g);
       const tools = agent ? providersOf(g, agent.id, "tool") : [];
