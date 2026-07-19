@@ -325,6 +325,19 @@ function SandboxInner() {
     }
   }
 
+  // Remoção por toque: no celular não há Backspace/Delete
+  const selNodeIds = nodes.filter((n) => n.selected).map((n) => n.id);
+  const hasSelEdge = edges.some((e) => e.selected);
+
+  function deleteSelected() {
+    const ids = new Set(selNodeIds);
+    setNodes((ns) => ns.filter((n) => !ids.has(n.id)));
+    setEdges((es) =>
+      es.filter((e) => !e.selected && !ids.has(e.source) && !ids.has(e.target))
+    );
+    setPending(null);
+  }
+
   function resetCanvas() {
     clearTimers();
     setNodes([]);
@@ -485,24 +498,20 @@ function SandboxInner() {
             Paleta de Nós (+)
           </p>
 
-          {/* Mobile: uma única faixa horizontal, todos os nós lado a lado */}
-          <div className="overflow-x-auto overscroll-x-contain lg:hidden">
-            <div className="flex gap-2 px-3 pb-3">
-              {NODE_CATALOG.map((c) => (
-                <button
-                  key={c.type}
-                  onClick={() => addNode(c.type)}
-                  title={c.desc}
-                  className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-edge bg-surface-2 px-3 py-2 text-xs active:border-neon/60"
-                >
-                  <span>{c.icon}</span>
-                  {c.label}
-                </button>
-              ))}
-              {/* espaçador: evita que o último chip fique colado na borda
-                  da tela (conflita com o gesto de "voltar" do iOS Safari) */}
-              <span className="w-2 shrink-0" aria-hidden="true" />
-            </div>
+          {/* Mobile: TODOS os nós visíveis, em linhas que quebram —
+              rolagem horizontal escondia os nós e parecia que haviam sumido */}
+          <div className="flex flex-wrap gap-1.5 px-3 pb-3 lg:hidden">
+            {NODE_CATALOG.map((c) => (
+              <button
+                key={c.type}
+                onClick={() => addNode(c.type)}
+                title={c.desc}
+                className="flex items-center gap-1 whitespace-nowrap rounded-md border border-edge bg-surface-2 px-2 py-1.5 text-[11px] active:border-neon/60"
+              >
+                <span>{c.icon}</span>
+                {c.label}
+              </button>
+            ))}
           </div>
 
           {/* Desktop: colunas agrupadas por categoria */}
@@ -560,6 +569,15 @@ function SandboxInner() {
             <div className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full border border-neon/50 bg-surface/95 px-4 py-1.5 text-xs font-semibold text-neon shadow-lg backdrop-blur">
               ● Toque na porta de destino para conectar (toque de novo para cancelar)
             </div>
+          )}
+
+          {(selNodeIds.length > 0 || hasSelEdge) && (
+            <button
+              onClick={deleteSelected}
+              className="absolute right-3 top-3 z-10 rounded-md border border-danger/60 bg-surface/95 px-3 py-2 text-xs font-bold text-danger shadow-lg backdrop-blur active:bg-danger/10"
+            >
+              🗑 Remover {selNodeIds.length > 0 ? "nó" : "conexão"}
+            </button>
           )}
 
           {nodes.length === 0 && (
