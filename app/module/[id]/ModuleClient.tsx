@@ -12,6 +12,7 @@ import {
 } from "@/lib/curriculum";
 import { CHALLENGES } from "@/lib/challenges";
 import { useAcademy, xpWithBonus } from "@/lib/store";
+import EduVisualRenderer from "@/components/edu/EduVisual";
 
 function NextStep({
   completedNodes,
@@ -174,6 +175,7 @@ export default function ModuleClient() {
             <p className="text-sm leading-relaxed text-foreground/90">
               {t.body}
             </p>
+            <EduVisualRenderer visual={t.visual} />
           </article>
         ))}
       </section>
