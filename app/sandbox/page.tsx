@@ -440,14 +440,36 @@ function SandboxInner() {
       )}
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        {/* Paleta de nós — faixa horizontal no celular, coluna no desktop */}
-        <aside className="w-full shrink-0 overflow-x-auto border-b border-edge bg-surface lg:w-52 lg:overflow-y-auto lg:overflow-x-hidden lg:border-b-0 lg:border-r">
+        {/* Paleta de nós — faixa única de rolagem horizontal no celular, coluna no desktop */}
+        <aside className="w-full shrink-0 border-b border-edge bg-surface lg:w-52 lg:overflow-y-auto lg:border-b-0 lg:border-r">
           <p className="px-3 pb-1 pt-3 font-mono text-[10px] uppercase tracking-widest text-muted">
             Paleta de Nós (+)
           </p>
-          <div className="flex lg:block">
+
+          {/* Mobile: uma única faixa horizontal, todos os nós lado a lado */}
+          <div className="overflow-x-auto overscroll-x-contain lg:hidden">
+            <div className="flex gap-2 px-3 pb-3">
+              {NODE_CATALOG.map((c) => (
+                <button
+                  key={c.type}
+                  onClick={() => addNode(c.type)}
+                  title={c.desc}
+                  className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-md border border-edge bg-surface-2 px-3 py-2 text-xs active:border-neon/60"
+                >
+                  <span>{c.icon}</span>
+                  {c.label}
+                </button>
+              ))}
+              {/* espaçador: evita que o último chip fique colado na borda
+                  da tela (conflita com o gesto de "voltar" do iOS Safari) */}
+              <span className="w-2 shrink-0" aria-hidden="true" />
+            </div>
+          </div>
+
+          {/* Desktop: colunas agrupadas por categoria */}
+          <div className="hidden lg:block">
             {CATEGORIES.map((cat) => (
-              <div key={cat} className="min-w-44 shrink-0 px-2 pb-2 lg:min-w-0">
+              <div key={cat} className="px-2 pb-2">
                 <p className="px-1 py-1 text-[10px] font-semibold uppercase text-neon/70">
                   {cat}
                 </p>
