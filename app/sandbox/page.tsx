@@ -25,6 +25,7 @@ import {
 import "@xyflow/react/dist/style.css";
 
 import FlowNode, { type AcademyNode } from "@/components/sandbox/FlowNode";
+import { TapConnectContext, type PendingHandle } from "@/components/sandbox/TapConnect";
 import WhatsAppWidget, {
   type ChatMessage,
 } from "@/components/sandbox/WhatsAppWidget";
@@ -94,7 +95,9 @@ function SandboxInner() {
   // reenquadra o canvas para nenhum nó ficar fora da área visível
   const requestFit = useCallback(() => {
     window.setTimeout(
-      () => fitView({ padding: 0.25, duration: 200, maxZoom: 1.2 }),
+      // minZoom evita que os nós encolham demais (e as portas fiquem
+      // pequenas demais para tocar) quando o canvas tem vários nós
+      () => fitView({ padding: 0.25, duration: 200, maxZoom: 1.2, minZoom: 0.7 }),
       60
     );
   }, [fitView]);
@@ -229,6 +232,40 @@ function SandboxInner() {
     [setEdges]
   );
 
+  // Modo "toque e toque": toca numa porta, depois na outra, sem precisar
+  // arrastar — no celular, acertar um arrasto entre duas portas pequenas é difícil.
+  const [pending, setPending] = useState<PendingHandle | null>(null);
+  const isSourceHandle = (handleId: string) => handleId.startsWith("out-");
+
+  const onHandleTap = useCallback(
+    (nodeId: string, handleId: string) => {
+      setPending((prev) => {
+        if (!prev) return { nodeId, handleId };
+        // toca de novo na mesma porta: cancela a seleção
+        if (prev.nodeId === nodeId && prev.handleId === handleId) return null;
+        // mesmo papel (as duas de saída, ou as duas de entrada): troca a seleção
+        if (isSourceHandle(prev.handleId) === isSourceHandle(handleId)) {
+          return { nodeId, handleId };
+        }
+        // mesmo nó, papéis diferentes: não conecta nó nele mesmo — troca a seleção
+        if (prev.nodeId === nodeId) return { nodeId, handleId };
+
+        // papéis complementares em nós diferentes: tenta conectar
+        const source = isSourceHandle(prev.handleId) ? prev : { nodeId, handleId };
+        const target = isSourceHandle(prev.handleId) ? { nodeId, handleId } : prev;
+        const conn: Connection = {
+          source: source.nodeId,
+          sourceHandle: source.handleId,
+          target: target.nodeId,
+          targetHandle: target.handleId,
+        };
+        if (isValidConnection(conn)) onConnect(conn);
+        return null;
+      });
+    },
+    [isValidConnection, onConnect]
+  );
+
   function clearTimers() {
     timers.current.forEach(clearTimeout);
     timers.current = [];
@@ -298,6 +335,7 @@ function SandboxInner() {
     setAwarded(null);
     setRunning(false);
     setTyping(false);
+    setPending(null);
   }
 
   function selectChallenge(id: string) {
@@ -315,6 +353,7 @@ function SandboxInner() {
       setLogSteps([]);
       setRunning(false);
       setTyping(false);
+      setPending(null);
       requestFit();
     }
   }
@@ -491,37 +530,51 @@ function SandboxInner() {
         </aside>
 
         {/* Canvas */}
-        <div className="relative min-h-[55vh] min-w-0 flex-1 lg:min-h-0">
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            isValidConnection={isValidConnection}
-            nodeTypes={nodeTypes}
-            fitView
-            deleteKeyCode={["Backspace", "Delete"]}
-            colorMode="dark"
-            proOptions={{ hideAttribution: false }}
-          >
-            <Background
-              variant={BackgroundVariant.Dots}
-              gap={24}
-              color="#1d2740"
-            />
-            <Controls />
-          </ReactFlow>
+        <div className="relative h-[55vh] min-w-0 flex-none lg:h-auto lg:min-h-0 lg:flex-1">
+          <TapConnectContext.Provider value={{ pending, onHandleTap }}>
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onPaneClick={() => setPending(null)}
+              isValidConnection={isValidConnection}
+              nodeTypes={nodeTypes}
+              fitView
+              fitViewOptions={{ padding: 0.25, maxZoom: 1.2, minZoom: 0.7 }}
+              deleteKeyCode={["Backspace", "Delete"]}
+              colorMode="dark"
+              proOptions={{ hideAttribution: false }}
+            >
+              <Background
+                variant={BackgroundVariant.Dots}
+                gap={24}
+                color="#1d2740"
+              />
+              <Controls />
+            </ReactFlow>
+          </TapConnectContext.Provider>
+
+          {pending && (
+            <div className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full border border-neon/50 bg-surface/95 px-4 py-1.5 text-xs font-semibold text-neon shadow-lg backdrop-blur">
+              ● Toque na porta de destino para conectar (toque de novo para cancelar)
+            </div>
+          )}
 
           {nodes.length === 0 && (
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
               <p className="max-w-sm text-center text-sm text-muted">
-                Clique em um nó na paleta à esquerda para adicioná-lo ao canvas
-                e arraste as conexões entre as portas.
+                Clique em um nó na paleta à esquerda para adicioná-lo ao canvas.
                 <br />
                 <span className="font-mono text-xs">
                   Fluxo principal: portas laterais (→). Sub-nós de IA: portas de
                   baixo (Model/Memory/Tool).
+                </span>
+                <br />
+                <span className="text-xs">
+                  Para conectar: arraste de uma porta à outra, ou toque em uma
+                  e depois na outra.
                 </span>
                 {!challenge && (
                   <>
