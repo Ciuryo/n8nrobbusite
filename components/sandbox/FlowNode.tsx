@@ -2,6 +2,7 @@
 
 import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
 import { CATALOG_BY_TYPE, type PortKind } from "@/lib/sandbox";
+import { useTapConnect } from "./TapConnect";
 
 export type AcademyNode = Node<{ ctype: string }, "academy">;
 
@@ -21,9 +22,23 @@ const PORT_COLOR: Record<PortKind, string> = {
   embedding: "#34d399",
 };
 
-export default function FlowNode({ data, selected }: NodeProps<AcademyNode>) {
+export default function FlowNode({ id, data, selected }: NodeProps<AcademyNode>) {
   const entry = CATALOG_BY_TYPE[data.ctype];
+  const { pending, onHandleTap } = useTapConnect();
   if (!entry) return null;
+
+  const isPending = (handleId: string) =>
+    pending?.nodeId === id && pending?.handleId === handleId;
+
+  const pendingStyle = (handleId: string, color: string) =>
+    isPending(handleId)
+      ? { background: color, boxShadow: `0 0 0 4px ${color}, 0 0 12px 4px ${color}` }
+      : { background: color };
+
+  const tap = (handleId: string) => (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onHandleTap(id, handleId);
+  };
 
   return (
     <div
@@ -36,7 +51,8 @@ export default function FlowNode({ data, selected }: NodeProps<AcademyNode>) {
           type="target"
           position={Position.Left}
           id="in-main"
-          style={{ background: PORT_COLOR.main }}
+          onClick={tap("in-main")}
+          style={pendingStyle("in-main", PORT_COLOR.main)}
         />
       )}
       {entry.mainOut && (
@@ -44,7 +60,8 @@ export default function FlowNode({ data, selected }: NodeProps<AcademyNode>) {
           type="source"
           position={Position.Right}
           id="out-main"
-          style={{ background: PORT_COLOR.main }}
+          onClick={tap("out-main")}
+          style={pendingStyle("out-main", PORT_COLOR.main)}
         />
       )}
       {entry.provides && (
@@ -52,7 +69,8 @@ export default function FlowNode({ data, selected }: NodeProps<AcademyNode>) {
           type="source"
           position={Position.Top}
           id={`out-${entry.provides}`}
-          style={{ background: PORT_COLOR[entry.provides] }}
+          onClick={tap(`out-${entry.provides}`)}
+          style={pendingStyle(`out-${entry.provides}`, PORT_COLOR[entry.provides])}
         />
       )}
       {entry.accepts.map((kind, i) => (
@@ -61,8 +79,9 @@ export default function FlowNode({ data, selected }: NodeProps<AcademyNode>) {
           type="target"
           position={Position.Bottom}
           id={`in-${kind}`}
+          onClick={tap(`in-${kind}`)}
           style={{
-            background: PORT_COLOR[kind],
+            ...pendingStyle(`in-${kind}`, PORT_COLOR[kind]),
             left: `${((i + 1) / (entry.accepts.length + 1)) * 100}%`,
           }}
         />

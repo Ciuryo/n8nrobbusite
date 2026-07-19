@@ -256,3 +256,11 @@ body {
   border: 2px solid var(--background);
 }
 .react-flow__handle-bottom { background: var(--neon-2); }
+
+/* Amplia a área de toque das portas sem aumentar o círculo visível —
+   essencial no celular, onde o dedo é bem menos preciso que o cursor. */
+.react-flow__handle::after {
+  content: "";
+  position: absolute;
+  inset: -10px;
+}
